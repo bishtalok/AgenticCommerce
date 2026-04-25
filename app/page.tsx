@@ -1,8 +1,19 @@
-import Link from "next/link";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { TopNav } from "@/components/shared/top-nav";
 import { DisclaimerBanner } from "@/components/shared/disclaimer-banner";
+import { useMissionStore } from "@/stores/missionStore";
 
 export default function HomePage() {
+  const router = useRouter();
+  const reset = useMissionStore((s) => s.reset);
+
+  function go(path: string) {
+    reset();
+    router.push(path);
+  }
+
   return (
     <>
       <TopNav />
@@ -21,18 +32,20 @@ export default function HomePage() {
               in under 90 seconds — with a clear reason for every item.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
-              <Link
-                href="/mission"
+              <button
+                type="button"
+                onClick={() => go("/mission")}
                 className="inline-flex items-center justify-center rounded-md bg-boots-navy px-6 py-3 text-base font-semibold text-white transition hover:bg-boots-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-boots-blue"
               >
                 Start travel mission
-              </Link>
-              <Link
-                href="/mission?q=travel+kit+for+Spain+next+week"
+              </button>
+              <button
+                type="button"
+                onClick={() => go("/mission?q=travel+kit+for+Spain+next+week")}
                 className="inline-flex items-center justify-center rounded-md border border-boots-navy px-6 py-3 text-base font-semibold text-boots-navy transition hover:bg-boots-sky"
               >
                 Try the example query
-              </Link>
+              </button>
             </div>
           </div>
           <div className="flex flex-col gap-3 rounded-xl border bg-boots-sky/40 p-6 md:min-w-[300px]">

@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
       priceBand: body.priceBand ?? planObj.constraints.priceBand,
       exclusions: body.exclusions,
       removedSkus: body.removedSkus,
+      destinationContext: body.destinationContext,
     });
 
     await logAuditEvent({

@@ -12,12 +12,14 @@ import type {
   NextQuestion,
   FulfilmentMode,
   PriceBand,
+  DestinationContext,
 } from "@/domain/types";
 
 export type ChatMessage =
   | { id: string; actor: "SYSTEM" | "AGENT" | "USER"; kind: "text"; text: string; at: number }
   | { id: string; actor: "AGENT"; kind: "question"; question: QuestionDef; at: number }
-  | { id: string; actor: "AGENT"; kind: "refusal"; text: string; at: number };
+  | { id: string; actor: "AGENT"; kind: "refusal"; text: string; at: number }
+  | { id: string; actor: "AGENT"; kind: "destination"; context: DestinationContext; at: number };
 
 export interface CartLine {
   sku: string;
@@ -140,7 +142,8 @@ export const useMissionStore = create<MissionState>()(
 type MessageDraft =
   | { actor: "SYSTEM" | "AGENT" | "USER"; kind: "text"; text: string }
   | { actor: "AGENT"; kind: "question"; question: QuestionDef }
-  | { actor: "AGENT"; kind: "refusal"; text: string };
+  | { actor: "AGENT"; kind: "refusal"; text: string }
+  | { actor: "AGENT"; kind: "destination"; context: DestinationContext };
 
 export function makeMessage(partial: MessageDraft): ChatMessage {
   const id =

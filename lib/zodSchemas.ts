@@ -41,11 +41,28 @@ export const missionPlanBody = z.object({
   answers: answersSchema,
 });
 
+export const destinationContextSchema = z.object({
+  matched: z.boolean(),
+  key: z.string(),
+  displayName: z.string(),
+  flag: z.string(),
+  region: z.string(),
+  uvIndexPeak: z.number(),
+  avgTempC: z.number(),
+  malariaRisk: z.boolean(),
+  tapWaterSafe: z.boolean(),
+  healthAdvisories: z.array(z.string()),
+  vaccineRecommendations: z.array(z.string()),
+  spfMinimum: z.number(),
+  packingNotes: z.array(z.string()),
+});
+
 export const bundleGenerateBody = z.object({
   planId: z.string().uuid(),
   priceBand: priceBandSchema.optional(),
   exclusions: z.array(categorySchema).optional(),
   removedSkus: z.array(z.string()).optional(),
+  destinationContext: destinationContextSchema.optional(),
 });
 
 export const availabilityCheckBody = z.object({

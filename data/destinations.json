@@ -1,0 +1,314 @@
+{
+  "spain": {
+    "displayName": "Spain",
+    "flag": "🇪🇸",
+    "region": "Southern Europe",
+    "uvIndexPeak": 9,
+    "avgTempC": 33,
+    "malariaRisk": false,
+    "tapWaterSafe": true,
+    "healthAdvisories": [],
+    "vaccineRecommendations": [],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 9 — SPF50 is the minimum safe option",
+      "Temperatures above 30°C — hydration is essential"
+    ]
+  },
+  "portugal": {
+    "displayName": "Portugal",
+    "flag": "🇵🇹",
+    "region": "Southern Europe",
+    "uvIndexPeak": 9,
+    "avgTempC": 30,
+    "malariaRisk": false,
+    "tapWaterSafe": true,
+    "healthAdvisories": [],
+    "vaccineRecommendations": [],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 9 — SPF50 recommended",
+      "Atlantic coast can be windy — lip protection useful"
+    ]
+  },
+  "greece": {
+    "displayName": "Greece",
+    "flag": "🇬🇷",
+    "region": "Southern Europe",
+    "uvIndexPeak": 10,
+    "avgTempC": 35,
+    "malariaRisk": false,
+    "tapWaterSafe": false,
+    "healthAdvisories": ["Drink bottled water on some islands"],
+    "vaccineRecommendations": [],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 10 (very high) — SPF50 essential",
+      "Temperatures can exceed 35°C — prioritise hydration",
+      "Use bottled water on smaller islands"
+    ]
+  },
+  "turkey": {
+    "displayName": "Turkey",
+    "flag": "🇹🇷",
+    "region": "Eastern Mediterranean",
+    "uvIndexPeak": 10,
+    "avgTempC": 35,
+    "malariaRisk": false,
+    "tapWaterSafe": false,
+    "healthAdvisories": ["Drink bottled water throughout"],
+    "vaccineRecommendations": ["Hepatitis A recommended"],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 10 — SPF50 essential",
+      "Drink bottled water only",
+      "Insect repellent advised in rural areas"
+    ]
+  },
+  "italy": {
+    "displayName": "Italy",
+    "flag": "🇮🇹",
+    "region": "Southern Europe",
+    "uvIndexPeak": 8,
+    "avgTempC": 31,
+    "malariaRisk": false,
+    "tapWaterSafe": true,
+    "healthAdvisories": [],
+    "vaccineRecommendations": [],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 8 — SPF50 recommended for beach and city",
+      "Temperatures regularly exceed 30°C in summer"
+    ]
+  },
+  "france": {
+    "displayName": "France",
+    "flag": "🇫🇷",
+    "region": "Western Europe",
+    "uvIndexPeak": 7,
+    "avgTempC": 27,
+    "malariaRisk": false,
+    "tapWaterSafe": true,
+    "healthAdvisories": [],
+    "vaccineRecommendations": [],
+    "spfMinimum": 30,
+    "packingNotes": [
+      "UV index 7 — SPF30 sufficient for most areas",
+      "South of France (Côte d'Azur) can reach UV 9 in peak summer"
+    ]
+  },
+  "croatia": {
+    "displayName": "Croatia",
+    "flag": "🇭🇷",
+    "region": "Adriatic",
+    "uvIndexPeak": 9,
+    "avgTempC": 32,
+    "malariaRisk": false,
+    "tapWaterSafe": true,
+    "healthAdvisories": [],
+    "vaccineRecommendations": [],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 9 — SPF50 recommended",
+      "Adriatic coast very sunny — sun protection essential all day"
+    ]
+  },
+  "egypt": {
+    "displayName": "Egypt",
+    "flag": "🇪🇬",
+    "region": "North Africa",
+    "uvIndexPeak": 11,
+    "avgTempC": 38,
+    "malariaRisk": false,
+    "tapWaterSafe": false,
+    "healthAdvisories": [
+      "Drink bottled water only",
+      "Avoid ice in drinks outside major hotels"
+    ],
+    "vaccineRecommendations": ["Hepatitis A recommended", "Typhoid recommended"],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 11 (extreme) — SPF50 is the minimum",
+      "Extreme heat — electrolyte hydration essential",
+      "Bottled water only — first aid kit recommended"
+    ]
+  },
+  "thailand": {
+    "displayName": "Thailand",
+    "flag": "🇹🇭",
+    "region": "Southeast Asia",
+    "uvIndexPeak": 12,
+    "avgTempC": 34,
+    "malariaRisk": true,
+    "tapWaterSafe": false,
+    "healthAdvisories": [
+      "Dengue fever risk — use insect repellent",
+      "Drink bottled water only"
+    ],
+    "vaccineRecommendations": [
+      "Hepatitis A recommended",
+      "Typhoid recommended",
+      "Consult your GP about malaria prevention"
+    ],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 12 (extreme) — maximum SPF essential",
+      "Dengue risk — insect repellent is a must",
+      "High humidity — hygiene essentials important"
+    ]
+  },
+  "dubai": {
+    "displayName": "Dubai / UAE",
+    "flag": "🇦🇪",
+    "region": "Middle East",
+    "uvIndexPeak": 11,
+    "avgTempC": 40,
+    "malariaRisk": false,
+    "tapWaterSafe": true,
+    "healthAdvisories": [],
+    "vaccineRecommendations": [],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 11 (extreme) — SPF50 essential",
+      "Temperatures can reach 40°C+ — electrolyte hydration critical",
+      "Dry desert heat — intensive moisturiser recommended"
+    ]
+  },
+  "morocco": {
+    "displayName": "Morocco",
+    "flag": "🇲🇦",
+    "region": "North Africa",
+    "uvIndexPeak": 10,
+    "avgTempC": 36,
+    "malariaRisk": false,
+    "tapWaterSafe": false,
+    "healthAdvisories": ["Drink bottled water only"],
+    "vaccineRecommendations": ["Hepatitis A recommended"],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 10 — SPF50 essential",
+      "Bottled water only",
+      "Medina markets — hand hygiene important"
+    ]
+  },
+  "cyprus": {
+    "displayName": "Cyprus",
+    "flag": "🇨🇾",
+    "region": "Eastern Mediterranean",
+    "uvIndexPeak": 10,
+    "avgTempC": 36,
+    "malariaRisk": false,
+    "tapWaterSafe": true,
+    "healthAdvisories": [],
+    "vaccineRecommendations": [],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 10 — SPF50 essential",
+      "One of Europe's hottest islands — hydration critical"
+    ]
+  },
+  "malta": {
+    "displayName": "Malta",
+    "flag": "🇲🇹",
+    "region": "Mediterranean",
+    "uvIndexPeak": 9,
+    "avgTempC": 32,
+    "malariaRisk": false,
+    "tapWaterSafe": true,
+    "healthAdvisories": [],
+    "vaccineRecommendations": [],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 9 — SPF50 recommended",
+      "Limestone reflects UV — protection needed even in shade"
+    ]
+  },
+  "ireland": {
+    "displayName": "Ireland",
+    "flag": "🇮🇪",
+    "region": "Northern Europe",
+    "uvIndexPeak": 5,
+    "avgTempC": 17,
+    "malariaRisk": false,
+    "tapWaterSafe": true,
+    "healthAdvisories": [],
+    "vaccineRecommendations": [],
+    "spfMinimum": 30,
+    "packingNotes": [
+      "UV index 5 — SPF30 sufficient",
+      "Changeable weather — light layers recommended"
+    ]
+  },
+  "uk": {
+    "displayName": "United Kingdom",
+    "flag": "🇬🇧",
+    "region": "Northern Europe",
+    "uvIndexPeak": 6,
+    "avgTempC": 20,
+    "malariaRisk": false,
+    "tapWaterSafe": true,
+    "healthAdvisories": [],
+    "vaccineRecommendations": [],
+    "spfMinimum": 30,
+    "packingNotes": [
+      "UV index 6 — SPF30 recommended on sunny days",
+      "Variable weather — pack for all conditions"
+    ]
+  },
+  "canaries": {
+    "displayName": "Canary Islands",
+    "flag": "🇮🇨",
+    "region": "Atlantic Islands",
+    "uvIndexPeak": 9,
+    "avgTempC": 27,
+    "malariaRisk": false,
+    "tapWaterSafe": true,
+    "healthAdvisories": [],
+    "vaccineRecommendations": [],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 9 year-round — SPF50 essential even in winter",
+      "Trade winds can mask how hot the sun is"
+    ]
+  },
+  "bali": {
+    "displayName": "Bali, Indonesia",
+    "flag": "🇮🇩",
+    "region": "Southeast Asia",
+    "uvIndexPeak": 12,
+    "avgTempC": 30,
+    "malariaRisk": true,
+    "tapWaterSafe": false,
+    "healthAdvisories": [
+      "Dengue fever risk — insect repellent essential",
+      "Drink bottled water only"
+    ],
+    "vaccineRecommendations": [
+      "Hepatitis A recommended",
+      "Typhoid recommended",
+      "Consult your GP about malaria prevention"
+    ],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 12 (extreme) — maximum protection essential",
+      "Dengue risk — insect repellent is non-negotiable",
+      "High humidity — hygiene essentials critical"
+    ]
+  },
+  "maldives": {
+    "displayName": "Maldives",
+    "flag": "🇲🇻",
+    "region": "Indian Ocean",
+    "uvIndexPeak": 12,
+    "avgTempC": 30,
+    "malariaRisk": false,
+    "tapWaterSafe": false,
+    "healthAdvisories": ["Use bottled or filtered water"],
+    "vaccineRecommendations": ["Hepatitis A recommended"],
+    "spfMinimum": 50,
+    "packingNotes": [
+      "UV index 12 (extreme) — reef-safe SPF50 essential",
+      "Water reflection doubles UV exposure on the ocean"
+    ]
+  }
+}

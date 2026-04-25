@@ -6,6 +6,7 @@ import { getOrCreateSession } from "@/lib/session";
 import { rateLimit } from "@/lib/rateLimit";
 import { classifyIntent } from "@/domain/agent/intentClassifier";
 import { isClinicalAdviceQuery, CLINICAL_ADVICE_REFUSAL } from "@/domain/agent/policyEngine";
+import { extractDestinationContext } from "@/domain/agent/destinationIntelligence";
 import { logAuditEvent } from "@/services/auditService";
 
 export async function POST(req: NextRequest) {
@@ -39,14 +40,20 @@ export async function POST(req: NextRequest) {
     }
 
     const result = classifyIntent(body.query);
+    const destinationContext = extractDestinationContext(body.query);
 
     await logAuditEvent({
       sessionId,
       eventType: "INTENT_CLASSIFIED",
-      payload: { query: body.query, result },
+      payload: {
+        query: body.query,
+        result,
+        destinationMatched: destinationContext.matched,
+        destinationKey: destinationContext.key || null,
+      },
     });
 
-    return NextResponse.json(result);
+    return NextResponse.json({ ...result, destinationContext });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return errorResponse(

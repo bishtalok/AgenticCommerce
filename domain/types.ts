@@ -124,3 +124,5 @@ export interface AvailabilityResult {
 }
 
 export type FulfilmentMode = "DELIVERY" | "CLICK_COLLECT";
+
+export type { DestinationContext } from "@/domain/agent/destinationIntelligence";

@@ -1,5 +1,6 @@
 import { getMissionConfig } from "@/domain/mission/config";
 import { filterByTraveller } from "@/domain/agent/policyEngine";
+import type { DestinationContext } from "@/domain/agent/destinationIntelligence";
 import type {
   Bundle,
   BundleItem,
@@ -15,6 +16,8 @@ export interface BuildBundleOptions {
   exclusions?: ProductCategory[];
   /** SKUs the user has explicitly removed — we respect these across regeneration. */
   removedSkus?: string[];
+  /** Destination intelligence context — enriches scoring and why strings. */
+  destinationContext?: DestinationContext;
 }
 
 /**
@@ -37,6 +40,7 @@ export function buildBundle(
   const priceBand = opts.priceBand ?? plan.constraints.priceBand;
   const excluded = new Set(opts.exclusions ?? []);
   const removed = new Set(opts.removedSkus ?? []);
+  const destCtx = opts.destinationContext;
 
   const warnings: string[] = [];
 
@@ -54,6 +58,7 @@ export function buildBundle(
       catalog: allowedCatalog,
       removed,
       alreadyPickedSkus: new Set(items.map((i) => i.sku)),
+      destCtx,
     });
 
     if (!pick) {
@@ -97,6 +102,7 @@ export function buildBundle(
         catalog: allowedCatalog,
         removed,
         alreadyPickedSkus: new Set(items.map((i) => i.sku)),
+        destCtx,
       });
       if (pick) {
         items.push({
@@ -132,6 +138,7 @@ interface PickArgs {
   catalog: Product[];
   removed: Set<string>;
   alreadyPickedSkus: Set<string>;
+  destCtx?: DestinationContext;
 }
 
 interface PickResult {
@@ -150,7 +157,7 @@ function pickProduct(args: PickArgs): PickResult | null {
 
   const scored = candidates.map((p) => ({
     product: p,
-    score: scoreCandidate(p, args.plan, args.priceBand),
+    score: scoreCandidate(p, args.plan, args.priceBand, args.destCtx),
   }));
   scored.sort((a, b) => b.score - a.score);
 
@@ -163,12 +170,17 @@ function pickProduct(args: PickArgs): PickResult | null {
 
   return {
     product: chosen,
-    why: buildWhy(chosen, args.plan),
+    why: buildWhy(chosen, args.plan, args.destCtx),
     effectivePriceBand,
   };
 }
 
-function scoreCandidate(p: Product, plan: TravelPlan, targetBand: PriceBand): number {
+function scoreCandidate(
+  p: Product,
+  plan: TravelPlan,
+  targetBand: PriceBand,
+  destCtx?: DestinationContext
+): number {
   let score = 10;
 
   // Price band match.
@@ -194,9 +206,34 @@ function scoreCandidate(p: Product, plan: TravelPlan, targetBand: PriceBand): nu
     score += 3;
   }
 
-  // Higher SPF preferred for beach trips.
-  if (plan.destinationType === "beach" && p.attributes.spf) {
-    score += Math.min(3, Math.floor(p.attributes.spf / 20));
+  // --- Destination intelligence rules ---
+  if (destCtx?.matched && p.category === "SUN_CARE") {
+    const spfMin = destCtx.spfMinimum;
+    const itemSpf = p.attributes.spf ?? 0;
+    if (itemSpf >= spfMin) {
+      // Meets destination minimum — strong boost
+      score += 6;
+    } else {
+      // Below destination minimum SPF — heavy penalty, effectively excluded
+      score -= 15;
+    }
+    // Extra boost for very high UV destinations
+    if (destCtx.uvIndexPeak >= 10 && itemSpf >= 50) score += 3;
+  } else if (!destCtx?.matched) {
+    // No destination: fall back to beach/destination type scoring
+    if (plan.destinationType === "beach" && p.attributes.spf) {
+      score += Math.min(3, Math.floor(p.attributes.spf / 20));
+    }
+  }
+
+  // Hot destinations → boost hydration
+  if (destCtx?.matched && destCtx.avgTempC >= 30 && p.category === "HYDRATION") {
+    score += 4;
+  }
+
+  // Unsafe water → boost first aid / hygiene
+  if (destCtx?.matched && !destCtx.tapWaterSafe) {
+    if (p.category === "FIRST_AID" || p.category === "HYGIENE") score += 2;
   }
 
   // Slight penalty on aerosol where a non-aerosol alternative exists.
@@ -214,22 +251,42 @@ function bandDistance(
   return Math.abs(order.indexOf(a) - order.indexOf(b));
 }
 
-function buildWhy(p: Product, plan: TravelPlan): string {
+function buildWhy(p: Product, plan: TravelPlan, destCtx?: DestinationContext): string {
   const parts: string[] = [];
 
   if (p.category === "SUN_CARE") {
-    if (plan.destinationType === "beach") parts.push("High sun exposure.");
-    else if (plan.destinationType === "mixed") parts.push("Some outdoor time expected.");
-    else if (plan.destinationType === "city") parts.push("Useful for sunny city days.");
-    else parts.push("Included by default for sun protection.");
+    if (destCtx?.matched) {
+      // Destination-specific why — much more compelling in the UI
+      parts.push(`UV index ${destCtx.uvIndexPeak} in ${destCtx.displayName} — SPF${destCtx.spfMinimum} minimum.`);
+    } else if (plan.destinationType === "beach") {
+      parts.push("High sun exposure.");
+    } else if (plan.destinationType === "mixed") {
+      parts.push("Some outdoor time expected.");
+    } else if (plan.destinationType === "city") {
+      parts.push("Useful for sunny city days.");
+    } else {
+      parts.push("Included by default for sun protection.");
+    }
   } else if (p.category === "TOILETRIES") {
     parts.push("Daily travel hygiene.");
   } else if (p.category === "HYGIENE") {
-    parts.push("Handy for flights and out and about.");
+    if (destCtx?.matched && !destCtx.tapWaterSafe) {
+      parts.push(`Tap water unsafe in ${destCtx.displayName} — hand hygiene essential.`);
+    } else {
+      parts.push("Handy for flights and out and about.");
+    }
   } else if (p.category === "FIRST_AID") {
-    parts.push("Covers minor cuts and grazes.");
+    if (destCtx?.matched && !destCtx.tapWaterSafe) {
+      parts.push(`Covers minor incidents — especially important where tap water is unsafe.`);
+    } else {
+      parts.push("Covers minor cuts and grazes.");
+    }
   } else if (p.category === "HYDRATION") {
-    parts.push("Helps in warm climates and long flights.");
+    if (destCtx?.matched && destCtx.avgTempC >= 30) {
+      parts.push(`${destCtx.avgTempC}°C average in ${destCtx.displayName} — hydration is essential.`);
+    } else {
+      parts.push("Helps in warm climates and long flights.");
+    }
   } else if (p.category === "LIP_CARE") {
     parts.push("Protects lips in dry or cold air.");
   } else if (p.category === "MOISTURISER") {

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { ChatMessage } from "@/stores/missionStore";
+import { DestinationCard } from "@/components/chat/destination-card";
 import { cn } from "@/lib/utils";
 
 export function MessageList({ messages }: { messages: ChatMessage[] }) {
@@ -33,6 +34,9 @@ export function MessageList({ messages }: { messages: ChatMessage[] }) {
               {m.text}
             </Bubble>
           );
+        }
+        if (m.kind === "destination") {
+          return <DestinationCard key={m.id} context={m.context} />;
         }
         return (
           <Bubble key={m.id} actor={m.actor}>

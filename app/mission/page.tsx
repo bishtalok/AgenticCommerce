@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, Suspense } from "react";
+import { useCallback, useEffect, useRef, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { TopNav } from "@/components/shared/top-nav";
 import { DisclaimerBanner } from "@/components/shared/disclaimer-banner";
@@ -17,6 +17,7 @@ import type {
   PriceBand,
   MissionCode,
   IntentResult,
+  DestinationContext,
 } from "@/domain/types";
 
 type Stage = "intent" | "questions" | "building" | "ready";
@@ -77,6 +78,9 @@ function MissionPageInner() {
   const [bundleLoading, setBundleLoading] = useState(false);
   const [bundleError, setBundleError] = useState<string | null>(null);
 
+  // Destination intelligence — stored in a ref so it's accessible from stale useCallback closures.
+  const destCtxRef = useRef<DestinationContext | null>(null);
+
   // Hydration: infer stage from persisted state
   useEffect(() => {
     if (bundle) setStage("ready");
@@ -113,7 +117,7 @@ function MissionPageInner() {
           body: JSON.stringify({ query: rawQuery }),
         });
         const data = (await res.json()) as
-          | (IntentResult & { refusal?: string })
+          | (IntentResult & { refusal?: string; destinationContext?: DestinationContext })
           | { error: { userMessage: string } };
 
         if (!res.ok) {
@@ -125,7 +129,7 @@ function MissionPageInner() {
           setBusy(false);
           return;
         }
-        const intent = data as IntentResult;
+        const intent = data as IntentResult & { destinationContext?: DestinationContext };
         if (!intent.missionCode || intent.confidence < 0.6) {
           pushMessage(
             makeMessage({
@@ -139,11 +143,30 @@ function MissionPageInner() {
           return;
         }
         setMission(intent.missionCode);
+
+        // Stash destination context for use throughout this session.
+        if (intent.destinationContext) {
+          destCtxRef.current = intent.destinationContext;
+        }
+
+        // Show destination intelligence card when we've matched a destination.
+        if (intent.destinationContext?.matched) {
+          pushMessage(
+            makeMessage({
+              actor: "AGENT",
+              kind: "destination",
+              context: intent.destinationContext,
+            })
+          );
+        }
+
         pushMessage(
           makeMessage({
             actor: "AGENT",
             kind: "text",
-            text: "Got it — travel mission. Let me ask a few quick questions.",
+            text: intent.destinationContext?.matched
+              ? `Got it — ${intent.destinationContext.displayName} travel kit. Just a couple of questions.`
+              : "Got it — travel mission. Let me ask a few quick questions.",
           })
         );
         await askNext(intent.missionCode, {});
@@ -207,6 +230,7 @@ function MissionPageInner() {
             planId: pid,
             priceBand: p.constraints.priceBand,
             removedSkus: [],
+            ...(destCtxRef.current ? { destinationContext: destCtxRef.current } : {}),
           }),
         });
         const bundleData = (await bundleRes.json()) as
@@ -249,6 +273,7 @@ function MissionPageInner() {
             planId,
             priceBand: opts.priceBand ?? priceBand ?? "mid",
             removedSkus: opts.removedSkus ?? removedSkus,
+            ...(destCtxRef.current ? { destinationContext: destCtxRef.current } : {}),
           }),
         });
         const data = (await res.json()) as

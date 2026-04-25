@@ -1,0 +1,56 @@
+[
+  {
+    "id": "DUBLIN_01",
+    "name": "Boots O'Connell Street",
+    "postcode": "D01",
+    "city": "Dublin",
+    "lat": 53.349805,
+    "lng": -6.26031,
+    "supportsClickCollect": true
+  },
+  {
+    "id": "DUBLIN_02",
+    "name": "Boots Grafton Street",
+    "postcode": "D02",
+    "city": "Dublin",
+    "lat": 53.343472,
+    "lng": -6.259869,
+    "supportsClickCollect": true
+  },
+  {
+    "id": "DUBLIN_03",
+    "name": "Boots Dundrum Town Centre",
+    "postcode": "D14",
+    "city": "Dublin",
+    "lat": 53.288944,
+    "lng": -6.242611,
+    "supportsClickCollect": true
+  },
+  {
+    "id": "CORK_01",
+    "name": "Boots Patrick Street",
+    "postcode": "T12",
+    "city": "Cork",
+    "lat": 51.898514,
+    "lng": -8.475528,
+    "supportsClickCollect": true
+  },
+  {
+    "id": "GALWAY_01",
+    "name": "Boots Eyre Square",
+    "postcode": "H91",
+    "city": "Galway",
+    "lat": 53.273273,
+    "lng": -9.049082,
+    "supportsClickCollect": false
+  },
+  {
+    "id": "LIMERICK_01",
+    "name": "Boots Crescent Shopping Centre",
+    "postcode": "V94",
+    "city": "Limerick",
+    "lat": 52.638,
+    "lng": -8.6308,
+    "supportsClickCollect": true
+  }
+]

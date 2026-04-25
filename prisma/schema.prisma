@@ -1,0 +1,212 @@
+// Boots ROI Travel Mission — Prisma schema
+// Mirrors PRD §6 (Data Models & Entities).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- Enums ----------
+
+enum Actor {
+  user
+  assistant
+  system
+}
+
+enum InventoryStatus {
+  IN_STOCK
+  LOW
+  OUT
+  UNKNOWN
+}
+
+enum FulfilmentMode {
+  DELIVERY
+  CLICK_COLLECT
+}
+
+enum CheckoutStatus {
+  CREATED
+  UPDATED
+  CONFIRMED
+  ABANDONED
+}
+
+enum OrderStatus {
+  PROCESSING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+// ---------- Core session ----------
+
+model Session {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now()) @map("created_at")
+  lastSeenAt  DateTime @default(now()) @map("last_seen_at")
+  locale      String   @default("en-IE")
+  device      String?
+
+  turns       ConversationTurn[]
+  plans       TravelPlan[]
+  baskets     Basket[]
+  auditEvents AuditEvent[]
+
+  @@index([lastSeenAt])
+  @@map("session")
+}
+
+model ConversationTurn {
+  id        String   @id @default(uuid())
+  sessionId String   @map("session_id")
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  actor     Actor
+  message   String
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([sessionId, createdAt])
+  @@map("conversation_turn")
+}
+
+model TravelPlan {
+  id        String   @id @default(uuid())
+  sessionId String   @map("session_id")
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  planJson  Json     @map("plan_json")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  baskets   Basket[]
+
+  @@map("travel_plan")
+}
+
+// ---------- Catalog ----------
+
+model Product {
+  sku         String  @id
+  name        String
+  category    String
+  subCategory String? @map("sub_category")
+  brand       String?
+  priceEur    Decimal @map("price_eur") @db.Decimal(10, 2)
+  attributes  Json?
+  warnings    String?
+
+  inventory   InventorySnapshot[]
+
+  @@index([category])
+  @@index([brand])
+  @@map("product")
+}
+
+model Store {
+  id                  String  @id
+  name                String
+  postcode            String
+  city                String
+  lat                 Decimal @db.Decimal(10, 6)
+  lng                 Decimal @db.Decimal(10, 6)
+  supportsClickCollect Boolean @default(true) @map("supports_click_collect")
+
+  inventory   InventorySnapshot[]
+  checkouts   CheckoutSession[]
+
+  @@map("store")
+}
+
+model InventorySnapshot {
+  id         String          @id @default(uuid())
+  storeId    String          @map("store_id")
+  store      Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  sku        String
+  product    Product         @relation(fields: [sku], references: [sku], onDelete: Cascade)
+  qty        Int
+  status     InventoryStatus
+  snapshotAt DateTime        @default(now()) @map("snapshot_at")
+
+  @@index([storeId, sku])
+  @@map("inventory_snapshot")
+}
+
+// ---------- Basket & checkout ----------
+
+model Basket {
+  id         String     @id @default(uuid())
+  sessionId  String     @map("session_id")
+  session    Session    @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  planId     String?    @map("plan_id")
+  plan       TravelPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+  items      Json        @default("[]")
+  subtotal   Decimal     @default(0) @db.Decimal(10, 2)
+  total      Decimal     @default(0) @db.Decimal(10, 2)
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+
+  checkouts  CheckoutSession[]
+
+  @@map("basket")
+}
+
+model CheckoutSession {
+  id              String          @id @default(uuid())
+  basketId        String          @map("basket_id")
+  basket          Basket          @relation(fields: [basketId], references: [id], onDelete: Cascade)
+  fulfilmentMode  FulfilmentMode  @map("fulfilment_mode")
+  storeId         String?         @map("store_id")
+  store           Store?          @relation(fields: [storeId], references: [id])
+  deliveryAddress Json?           @map("delivery_address")
+  status          CheckoutStatus  @default(CREATED)
+  totals          Json?
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  mandates  ConsentMandate[]
+  orders    Order[]
+
+  @@index([status])
+  @@map("checkout_session")
+}
+
+model ConsentMandate {
+  id                String          @id @default(uuid())
+  checkoutSessionId String          @map("checkout_session_id")
+  checkoutSession   CheckoutSession @relation(fields: [checkoutSessionId], references: [id], onDelete: Cascade)
+  scope             Json
+  hash              String
+  expiresAt         DateTime        @map("expires_at")
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  @@map("consent_mandate")
+}
+
+model Order {
+  id                String          @id @default(uuid())
+  checkoutSessionId String          @map("checkout_session_id")
+  checkoutSession   CheckoutSession @relation(fields: [checkoutSessionId], references: [id], onDelete: Cascade)
+  orderNumber       String          @unique @map("order_number")
+  status            OrderStatus     @default(PROCESSING)
+  statusHistory     Json            @default("[]") @map("status_history")
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  @@map("order")
+}
+
+// ---------- Audit ----------
+
+model AuditEvent {
+  id        String   @id @default(uuid())
+  sessionId String   @map("session_id")
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  eventType String   @map("event_type")
+  payload   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([sessionId, createdAt])
+  @@map("audit_event")
+}

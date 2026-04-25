@@ -1,0 +1,713 @@
+[
+  {
+    "sku": "SPF30_100ML_V",
+    "name": "Boots Soltan Protect & Moisturise SPF30 100ml",
+    "category": "SUN_CARE",
+    "subCategory": "sunscreen_lotion",
+    "brand": "Soltan",
+    "priceEur": 8.99,
+    "attributes": {
+      "priceBand": "value",
+      "spf": 30,
+      "sizeMl": 100,
+      "travelSize": true,
+      "fragranceFree": false,
+      "sensitiveSkin": false,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "SPF50_100ML_V",
+    "name": "Boots Soltan Protect & Moisturise SPF50 100ml",
+    "category": "SUN_CARE",
+    "subCategory": "sunscreen_lotion",
+    "brand": "Soltan",
+    "priceEur": 10.99,
+    "attributes": {
+      "priceBand": "value",
+      "spf": 50,
+      "sizeMl": 100,
+      "travelSize": true,
+      "fragranceFree": false,
+      "sensitiveSkin": false,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "SPF50_SENS_100ML_M",
+    "name": "La Roche-Posay Anthelios SPF50 Sensitive 100ml",
+    "category": "SUN_CARE",
+    "subCategory": "sunscreen_lotion",
+    "brand": "La Roche-Posay",
+    "priceEur": 18.99,
+    "attributes": {
+      "priceBand": "mid",
+      "spf": 50,
+      "sizeMl": 100,
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "SPF50_MINERAL_75ML_P",
+    "name": "Avène Mineral Fluid SPF50+ 75ml",
+    "category": "SUN_CARE",
+    "subCategory": "sunscreen_lotion",
+    "brand": "Avène",
+    "priceEur": 24.99,
+    "attributes": {
+      "priceBand": "premium",
+      "spf": 50,
+      "sizeMl": 75,
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "SPF50_KIDS_150ML_M",
+    "name": "Soltan Kids Protect & Play SPF50 150ml",
+    "category": "SUN_CARE",
+    "subCategory": "sunscreen_lotion",
+    "brand": "Soltan",
+    "priceEur": 12.99,
+    "attributes": {
+      "priceBand": "mid",
+      "spf": 50,
+      "sizeMl": 150,
+      "travelSize": false,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false,
+      "forChildren": true
+    },
+    "warnings": null
+  },
+  {
+    "sku": "AFTERSUN_200ML_V",
+    "name": "Boots Soltan Aftersun Cool Gel 200ml",
+    "category": "SUN_CARE",
+    "subCategory": "aftersun",
+    "brand": "Soltan",
+    "priceEur": 6.49,
+    "attributes": {
+      "priceBand": "value",
+      "sizeMl": 200,
+      "travelSize": false,
+      "fragranceFree": false,
+      "sensitiveSkin": false,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "LIPSPF_4G_V",
+    "name": "Boots SPF30 Lip Balm 4g",
+    "category": "LIP_CARE",
+    "subCategory": "lip_balm_spf",
+    "brand": "Boots",
+    "priceEur": 3.49,
+    "attributes": {
+      "priceBand": "value",
+      "spf": 30,
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "LIPBALM_PLAIN_4G_V",
+    "name": "Boots Essentials Lip Balm 4g",
+    "category": "LIP_CARE",
+    "subCategory": "lip_balm",
+    "brand": "Boots Essentials",
+    "priceEur": 1.99,
+    "attributes": {
+      "priceBand": "value",
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "SHAMPOO_MINI_75ML_V",
+    "name": "Head & Shoulders Travel Shampoo 75ml",
+    "category": "TOILETRIES",
+    "subCategory": "shampoo",
+    "brand": "Head & Shoulders",
+    "priceEur": 2.49,
+    "attributes": {
+      "priceBand": "value",
+      "sizeMl": 75,
+      "travelSize": true,
+      "fragranceFree": false,
+      "sensitiveSkin": false,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "SHAMPOO_MINI_SENS_75ML_M",
+    "name": "Simple Kind to Skin Shampoo 75ml",
+    "category": "TOILETRIES",
+    "subCategory": "shampoo",
+    "brand": "Simple",
+    "priceEur": 3.29,
+    "attributes": {
+      "priceBand": "mid",
+      "sizeMl": 75,
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "BODYWASH_MINI_75ML_V",
+    "name": "Dove Travel Body Wash 75ml",
+    "category": "TOILETRIES",
+    "subCategory": "body_wash",
+    "brand": "Dove",
+    "priceEur": 2.29,
+    "attributes": {
+      "priceBand": "value",
+      "sizeMl": 75,
+      "travelSize": true,
+      "fragranceFree": false,
+      "sensitiveSkin": false,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "BODYWASH_SENS_MINI_75ML_M",
+    "name": "Sanex Zero% Sensitive Travel Body Wash 75ml",
+    "category": "TOILETRIES",
+    "subCategory": "body_wash",
+    "brand": "Sanex",
+    "priceEur": 3.49,
+    "attributes": {
+      "priceBand": "mid",
+      "sizeMl": 75,
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "TOOTHPASTE_MINI_25ML_V",
+    "name": "Colgate Travel Toothpaste 25ml",
+    "category": "TOILETRIES",
+    "subCategory": "toothpaste",
+    "brand": "Colgate",
+    "priceEur": 1.49,
+    "attributes": {
+      "priceBand": "value",
+      "sizeMl": 25,
+      "travelSize": true,
+      "fragranceFree": false,
+      "sensitiveSkin": false,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "TOOTHPASTE_SENS_MINI_25ML_M",
+    "name": "Sensodyne Daily Care Travel 25ml",
+    "category": "TOILETRIES",
+    "subCategory": "toothpaste",
+    "brand": "Sensodyne",
+    "priceEur": 2.99,
+    "attributes": {
+      "priceBand": "mid",
+      "sizeMl": 25,
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "TOOTHBRUSH_TRAVEL_V",
+    "name": "Boots Travel Toothbrush",
+    "category": "TOILETRIES",
+    "subCategory": "toothbrush",
+    "brand": "Boots",
+    "priceEur": 1.99,
+    "attributes": {
+      "priceBand": "value",
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "DEODORANT_AEROSOL_75ML_V",
+    "name": "Sure Invisible Aerosol 75ml",
+    "category": "TOILETRIES",
+    "subCategory": "deodorant",
+    "brand": "Sure",
+    "priceEur": 2.99,
+    "attributes": {
+      "priceBand": "value",
+      "sizeMl": 75,
+      "travelSize": true,
+      "fragranceFree": false,
+      "sensitiveSkin": false,
+      "aerosol": true,
+      "restrictedForChildren": true
+    },
+    "warnings": "Pressurised container. Protect from sunlight."
+  },
+  {
+    "sku": "DEODORANT_ROLLON_50ML_M",
+    "name": "Dove Roll-On Sensitive 50ml",
+    "category": "TOILETRIES",
+    "subCategory": "deodorant",
+    "brand": "Dove",
+    "priceEur": 3.49,
+    "attributes": {
+      "priceBand": "mid",
+      "sizeMl": 50,
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "SANITISER_50ML_V",
+    "name": "Boots Hand Sanitiser Gel 50ml",
+    "category": "HYGIENE",
+    "subCategory": "hand_sanitiser",
+    "brand": "Boots",
+    "priceEur": 1.29,
+    "attributes": {
+      "priceBand": "value",
+      "sizeMl": 50,
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": "Keep away from eyes. Flammable."
+  },
+  {
+    "sku": "SANITISER_100ML_M",
+    "name": "Carex Aloe Vera Hand Gel 100ml",
+    "category": "HYGIENE",
+    "subCategory": "hand_sanitiser",
+    "brand": "Carex",
+    "priceEur": 2.49,
+    "attributes": {
+      "priceBand": "mid",
+      "sizeMl": 100,
+      "travelSize": true,
+      "fragranceFree": false,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": "Keep away from eyes. Flammable."
+  },
+  {
+    "sku": "WIPES_ANTIBAC_15_V",
+    "name": "Dettol Antibacterial Wipes 15-pack",
+    "category": "HYGIENE",
+    "subCategory": "wipes",
+    "brand": "Dettol",
+    "priceEur": 1.99,
+    "attributes": {
+      "priceBand": "value",
+      "travelSize": true,
+      "fragranceFree": false,
+      "sensitiveSkin": false,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "WIPES_SENS_20_M",
+    "name": "WaterWipes Sensitive Travel Wipes 20-pack",
+    "category": "HYGIENE",
+    "subCategory": "wipes",
+    "brand": "WaterWipes",
+    "priceEur": 2.99,
+    "attributes": {
+      "priceBand": "mid",
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "TISSUES_POCKET_4PK_V",
+    "name": "Boots Pocket Tissues 4-pack",
+    "category": "HYGIENE",
+    "subCategory": "tissues",
+    "brand": "Boots",
+    "priceEur": 1.29,
+    "attributes": {
+      "priceBand": "value",
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "PLASTERS_ASSORTED_40_V",
+    "name": "Boots Fabric Plasters Assorted 40-pack",
+    "category": "FIRST_AID",
+    "subCategory": "plasters",
+    "brand": "Boots",
+    "priceEur": 2.29,
+    "attributes": {
+      "priceBand": "value",
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "PLASTERS_WATERPROOF_20_M",
+    "name": "Elastoplast Waterproof Plasters 20-pack",
+    "category": "FIRST_AID",
+    "subCategory": "plasters",
+    "brand": "Elastoplast",
+    "priceEur": 3.49,
+    "attributes": {
+      "priceBand": "mid",
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "ANTISEPTIC_CREAM_30G_V",
+    "name": "Savlon Antiseptic Cream 30g",
+    "category": "FIRST_AID",
+    "subCategory": "antiseptic",
+    "brand": "Savlon",
+    "priceEur": 3.99,
+    "attributes": {
+      "priceBand": "value",
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": "For external use only."
+  },
+  {
+    "sku": "ANTISEPTIC_SPRAY_50ML_M",
+    "name": "Germolene Antiseptic Spray 50ml",
+    "category": "FIRST_AID",
+    "subCategory": "antiseptic",
+    "brand": "Germolene",
+    "priceEur": 5.49,
+    "attributes": {
+      "priceBand": "mid",
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": true,
+      "restrictedForChildren": true
+    },
+    "warnings": "For external use only. Pressurised container."
+  },
+  {
+    "sku": "INSECT_REPELLENT_75ML_M",
+    "name": "Jungle Formula Maximum 75ml",
+    "category": "FIRST_AID",
+    "subCategory": "insect_repellent",
+    "brand": "Jungle Formula",
+    "priceEur": 7.99,
+    "attributes": {
+      "priceBand": "mid",
+      "sizeMl": 75,
+      "travelSize": true,
+      "fragranceFree": false,
+      "sensitiveSkin": false,
+      "aerosol": false,
+      "restrictedForChildren": true
+    },
+    "warnings": "Apply sparingly. Keep away from eyes and mouth."
+  },
+  {
+    "sku": "INSECT_REPELLENT_KIDS_100ML_M",
+    "name": "Jungle Formula Kids Lotion 100ml",
+    "category": "FIRST_AID",
+    "subCategory": "insect_repellent",
+    "brand": "Jungle Formula",
+    "priceEur": 8.99,
+    "attributes": {
+      "priceBand": "mid",
+      "sizeMl": 100,
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false,
+      "forChildren": true
+    },
+    "warnings": "Apply sparingly. For use in children over 2 years."
+  },
+  {
+    "sku": "ELECTROLYTE_TABS_20_V",
+    "name": "Dioralyte Electrolyte Sachets 6-pack",
+    "category": "HYDRATION",
+    "subCategory": "electrolyte",
+    "brand": "Dioralyte",
+    "priceEur": 4.99,
+    "attributes": {
+      "priceBand": "value",
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "ELECTROLYTE_SPORT_20_M",
+    "name": "SiS Hydro Tabs 20-pack",
+    "category": "HYDRATION",
+    "subCategory": "electrolyte",
+    "brand": "SiS",
+    "priceEur": 7.99,
+    "attributes": {
+      "priceBand": "mid",
+      "travelSize": true,
+      "fragranceFree": false,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "HYDRATION_POWDER_10_P",
+    "name": "Precision Hydration 1500 Sachets 10-pack",
+    "category": "HYDRATION",
+    "subCategory": "electrolyte",
+    "brand": "Precision Hydration",
+    "priceEur": 14.99,
+    "attributes": {
+      "priceBand": "premium",
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "MOIST_FACE_SENS_50ML_M",
+    "name": "Cetaphil Moisturising Lotion 50ml",
+    "category": "MOISTURISER",
+    "subCategory": "face_moisturiser",
+    "brand": "Cetaphil",
+    "priceEur": 6.99,
+    "attributes": {
+      "priceBand": "mid",
+      "sizeMl": 50,
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "MOIST_BODY_100ML_V",
+    "name": "Nivea Soft Travel 100ml",
+    "category": "MOISTURISER",
+    "subCategory": "body_moisturiser",
+    "brand": "Nivea",
+    "priceEur": 3.49,
+    "attributes": {
+      "priceBand": "value",
+      "sizeMl": 100,
+      "travelSize": true,
+      "fragranceFree": false,
+      "sensitiveSkin": false,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "MOIST_BODY_SENS_100ML_M",
+    "name": "E45 Dermatological Cream 100ml",
+    "category": "MOISTURISER",
+    "subCategory": "body_moisturiser",
+    "brand": "E45",
+    "priceEur": 5.99,
+    "attributes": {
+      "priceBand": "mid",
+      "sizeMl": 100,
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  },
+  {
+    "sku": "ANTIHIST_TABS_14_M",
+    "name": "Boots Hayfever & Allergy Relief 14 tablets",
+    "category": "FIRST_AID",
+    "subCategory": "antihistamine",
+    "brand": "Boots",
+    "priceEur": 4.49,
+    "attributes": {
+      "priceBand": "mid",
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": true
+    },
+    "warnings": "Read enclosed leaflet. Not suitable for children under 12."
+  },
+  {
+    "sku": "PAIN_RELIEF_16_V",
+    "name": "Boots Paracetamol 500mg 16 tablets",
+    "category": "FIRST_AID",
+    "subCategory": "pain_relief",
+    "brand": "Boots",
+    "priceEur": 1.79,
+    "attributes": {
+      "priceBand": "value",
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": true
+    },
+    "warnings": "Always read the label. Not suitable for children under 12."
+  },
+  {
+    "sku": "TRAVEL_SICKNESS_12_M",
+    "name": "Boots Travel Sickness Tablets 12-pack",
+    "category": "FIRST_AID",
+    "subCategory": "motion_sickness",
+    "brand": "Boots",
+    "priceEur": 3.29,
+    "attributes": {
+      "priceBand": "mid",
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": true
+    },
+    "warnings": "Always read the label. Not suitable for children under 12."
+  },
+  {
+    "sku": "EYE_DROPS_10ML_M",
+    "name": "Optrex ActiMist 2-in-1 10ml",
+    "category": "FIRST_AID",
+    "subCategory": "eye_care",
+    "brand": "Optrex",
+    "priceEur": 9.99,
+    "attributes": {
+      "priceBand": "mid",
+      "sizeMl": 10,
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": "For external use. Read enclosed leaflet."
+  },
+  {
+    "sku": "RAZOR_DISPOSABLE_3PK_V",
+    "name": "Gilette Blue Disposable 3-pack",
+    "category": "TOILETRIES",
+    "subCategory": "shaving",
+    "brand": "Gillette",
+    "priceEur": 2.99,
+    "attributes": {
+      "priceBand": "value",
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": true
+    },
+    "warnings": "Keep out of reach of children."
+  },
+  {
+    "sku": "CONDITIONER_MINI_75ML_M",
+    "name": "Aveeno Travel Conditioner 75ml",
+    "category": "TOILETRIES",
+    "subCategory": "conditioner",
+    "brand": "Aveeno",
+    "priceEur": 3.29,
+    "attributes": {
+      "priceBand": "mid",
+      "sizeMl": 75,
+      "travelSize": true,
+      "fragranceFree": true,
+      "sensitiveSkin": true,
+      "aerosol": false,
+      "restrictedForChildren": false
+    },
+    "warnings": null
+  }
+]

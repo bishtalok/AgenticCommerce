@@ -53,7 +53,7 @@ export function ChatPanel({
         </button>
       </header>
 
-      <MessageList messages={messages} />
+      <MessageList messages={messages} busy={busy} />
 
       <div className="border-t bg-boots-sky/30 p-4">
         {error ? (

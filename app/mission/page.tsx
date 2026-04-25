@@ -517,7 +517,7 @@ function MissionPageInner() {
 
   return (
     <PageFrame>
-      <div className="mx-auto grid h-[calc(100vh-6.5rem)] max-w-6xl grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="mx-auto grid h-[calc(100vh-6.5rem)] max-w-6xl grid-cols-1 md:grid-cols-[minmax(0,1fr)_390px]">
         <ChatPanel
           messages={messages}
           currentQuestion={currentQ}

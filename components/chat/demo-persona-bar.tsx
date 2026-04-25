@@ -22,22 +22,25 @@ export function DemoPersonaBar({ onSelect }: DemoPersonaBarProps) {
     <div
       role="region"
       aria-label="Demo persona shortcuts"
-      className="border-t bg-muted/30 px-4 py-2"
+      className="mt-3"
     >
-      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-        Demo shortcuts — autonomous proposals
+      <p className="mb-2.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+        Try a demo persona
       </p>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap gap-2">
         {personas.map((p) => (
           <button
             key={p.id}
             type="button"
             onClick={() => onSelect(p.simulatedQuery, p)}
-            className="flex items-center gap-1.5 rounded-full border border-boots-navy/20 bg-white px-3 py-1 text-xs font-medium text-boots-navy shadow-sm hover:bg-boots-sky/20 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-boots-blue transition-colors"
-            title={`${p.description}\n${p.profileNote}`}
+            title={p.profileNote}
+            className="flex items-center gap-2.5 rounded-xl border border-border bg-white px-3 py-2 text-left transition hover:border-boots-blue hover:bg-boots-sky focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-boots-blue"
           >
-            <span aria-hidden>{p.avatar}</span>
-            <span>{p.label}</span>
+            <span className="text-lg leading-none" aria-hidden>{p.avatar}</span>
+            <div>
+              <p className="text-xs font-bold leading-tight text-boots-navy">{p.label.split(" · ")[0]}</p>
+              <p className="text-[10px] leading-tight text-muted-foreground">{p.description}</p>
+            </div>
           </button>
         ))}
       </div>

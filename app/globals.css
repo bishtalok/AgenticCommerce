@@ -2,9 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes dot-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.85); }
+  50%       { opacity: 1;    transform: scale(1);    }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+.anim-fade-up { animation: fade-up 0.3s ease both; }
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 60 11% 97%; /* #F7F7F5 */
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
     --card-foreground: 222 47% 11%;

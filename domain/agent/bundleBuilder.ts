@@ -336,7 +336,7 @@ function buildWhy(p: Product, plan: TravelPlan, destCtx?: DestinationContext): s
     }
   } else if (p.category === "FIRST_AID") {
     if (destCtx?.matched && !destCtx.tapWaterSafe) {
-      parts.push(`Covers minor incidents — especially important where tap water is unsafe.`);
+      parts.push(`Covers minor cuts and grazes. Tap water in ${destCtx!.displayName} is unsafe to clean wounds with — keeping them sealed reduces infection risk.`);
     } else {
       parts.push("Covers minor cuts and grazes.");
     }

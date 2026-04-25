@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")       // pooled (pgBouncer) — used at runtime
+  directUrl = env("DIRECT_URL")         // direct — used by prisma migrate / seed
 }
 
 // ---------- Enums ----------

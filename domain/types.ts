@@ -139,6 +139,30 @@ export interface IntentResult {
   alternatives: Array<{ missionCode: string; confidence: number }>;
 }
 
+/** Wraps a single inferred value with its confidence and a human-readable source explanation. */
+export interface InferredField<T> {
+  value: T;
+  /** 0–1 extraction confidence for this specific field. */
+  confidence: number;
+  /** Short text shown in the inference card, e.g. "from '2 weeks'". */
+  source: string;
+}
+
+/** Result of running all query-intelligence extractors on the user's free-text query. */
+export interface InferenceResult {
+  destinationType: InferredField<DestinationType> | null;
+  durationDays: InferredField<number> | null;
+  travellerType: InferredField<TravellerType> | null;
+  sensitivities: InferredField<Sensitivity[]> | null;
+  priceBand: InferredField<PriceBand> | null;
+  /** Average confidence across the three critical fields (destinationType, durationDays, travellerType). */
+  overallConfidence: number;
+  /** All three critical fields extracted at confidence ≥ 0.7 — safe to skip the question flow entirely. */
+  canSkipAllQuestions: boolean;
+  /** At least one critical field extracted at confidence ≥ 0.7 — skip known questions. */
+  canSkipSomeQuestions: boolean;
+}
+
 export interface QuestionDef {
   id: string;
   order: number;

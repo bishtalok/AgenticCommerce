@@ -1,0 +1,26 @@
+[
+  {
+    "id": "returning-family",
+    "label": "Sarah · Returning customer",
+    "description": "3 beach trips · Family · Sensitive skin · Mid budget",
+    "simulatedQuery": "beach holiday Thailand 2 weeks family two kids sensitive skin",
+    "profileNote": "Phase 2 simulation — preferences loaded from loyalty history",
+    "avatar": "👩‍👧‍👦"
+  },
+  {
+    "id": "solo-premium",
+    "label": "James · Premium traveller",
+    "description": "Solo · Premium budget · Maldives regular",
+    "simulatedQuery": "luxury solo trip to the maldives for 10 days",
+    "profileNote": "Phase 2 simulation — loyalty tier Premium, past Maldives orders",
+    "avatar": "👨‍💼"
+  },
+  {
+    "id": "city-quick",
+    "label": "Aoife · Quick city break",
+    "description": "City breaks only · 3–4 days · Budget",
+    "simulatedQuery": "quick city break Barcelona 3 days solo budget",
+    "profileNote": "Phase 2 simulation — preference profile: city, short, value",
+    "avatar": "👩‍🎒"
+  }
+]

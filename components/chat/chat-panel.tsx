@@ -4,6 +4,8 @@ import { useState } from "react";
 import type { QuestionDef, NextQuestion } from "@/domain/types";
 import { MessageList } from "./message-list";
 import { QuestionCard } from "./question-card";
+import { DemoPersonaBar } from "./demo-persona-bar";
+import type { Persona } from "./demo-persona-bar";
 import type { ChatMessage } from "@/stores/missionStore";
 
 export function ChatPanel({
@@ -17,6 +19,7 @@ export function ChatPanel({
   onAnswerQuestion,
   onSkipQuestion,
   onRestart,
+  onSelectPersona,
 }: {
   messages: ChatMessage[];
   currentQuestion: QuestionDef | null;
@@ -28,6 +31,7 @@ export function ChatPanel({
   onAnswerQuestion: (value: unknown) => void;
   onSkipQuestion: () => void;
   onRestart: () => void;
+  onSelectPersona: (query: string, persona: Persona) => void;
 }) {
   const [draft, setDraft] = useState("");
 
@@ -62,37 +66,40 @@ export function ChatPanel({
         ) : null}
 
         {stage === "intent" ? (
-          <form
-            className="flex flex-col gap-2 sm:flex-row"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (draft.trim().length >= 3 && !busy) {
-                onSubmitFreeText(draft.trim());
-                setDraft("");
-              }
-            }}
-          >
-            <label htmlFor="intent-input" className="sr-only">
-              Describe your trip
-            </label>
-            <input
-              id="intent-input"
-              type="text"
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              disabled={busy}
-              placeholder="e.g. travel kit for Spain next week"
-              autoComplete="off"
-              className="w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-boots-blue"
-            />
-            <button
-              type="submit"
-              disabled={busy || draft.trim().length < 3}
-              className="rounded-md bg-boots-navy px-4 py-2 text-sm font-semibold text-white hover:bg-boots-blue disabled:opacity-50"
+          <>
+            <form
+              className="flex flex-col gap-2 sm:flex-row"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (draft.trim().length >= 3 && !busy) {
+                  onSubmitFreeText(draft.trim());
+                  setDraft("");
+                }
+              }}
             >
-              {busy ? "Thinking…" : "Start"}
-            </button>
-          </form>
+              <label htmlFor="intent-input" className="sr-only">
+                Describe your trip
+              </label>
+              <input
+                id="intent-input"
+                type="text"
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                disabled={busy}
+                placeholder="e.g. family beach holiday Thailand 2 weeks"
+                autoComplete="off"
+                className="w-full rounded-md border px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-boots-blue"
+              />
+              <button
+                type="submit"
+                disabled={busy || draft.trim().length < 3}
+                className="rounded-md bg-boots-navy px-4 py-2 text-sm font-semibold text-white hover:bg-boots-blue disabled:opacity-50"
+              >
+                {busy ? "Thinking…" : "Start"}
+              </button>
+            </form>
+            <DemoPersonaBar onSelect={onSelectPersona} />
+          </>
         ) : null}
 
         {stage === "questions" && currentQuestion && progress ? (

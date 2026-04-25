@@ -19,7 +19,9 @@ import type {
   MissionCode,
   IntentResult,
   DestinationContext,
+  InferenceResult,
 } from "@/domain/types";
+import type { Persona } from "@/components/chat/demo-persona-bar";
 
 type Stage = "intent" | "questions" | "building" | "ready";
 
@@ -67,6 +69,7 @@ function MissionPageInner() {
     setPlan,
     setBundle,
     setReasoning,
+    setInference,
     setPriceBand,
     removeSku,
     setBasket,
@@ -120,7 +123,11 @@ function MissionPageInner() {
           body: JSON.stringify({ query: rawQuery }),
         });
         const data = (await res.json()) as
-          | (IntentResult & { refusal?: string; destinationContext?: DestinationContext })
+          | (IntentResult & {
+              refusal?: string;
+              destinationContext?: DestinationContext;
+              inferenceResult?: InferenceResult;
+            })
           | { error: { userMessage: string } };
 
         if (!res.ok) {
@@ -132,14 +139,17 @@ function MissionPageInner() {
           setBusy(false);
           return;
         }
-        const intent = data as IntentResult & { destinationContext?: DestinationContext };
+        const intent = data as IntentResult & {
+          destinationContext?: DestinationContext;
+          inferenceResult?: InferenceResult;
+        };
         if (!intent.missionCode || intent.confidence < 0.6) {
           pushMessage(
             makeMessage({
               actor: "AGENT",
               kind: "text",
               text:
-                "I couldn't confidently match that to a mission. Try mentioning a trip — for example, \"travel kit for Spain next week\".",
+                'I couldn\'t confidently match that to a mission. Try mentioning a trip — for example, "travel kit for Spain next week".',
             })
           );
           setBusy(false);
@@ -152,6 +162,10 @@ function MissionPageInner() {
           destCtxRef.current = intent.destinationContext;
         }
 
+        // Stash inference result.
+        const inferenceResult = intent.inferenceResult ?? null;
+        setInference(inferenceResult);
+
         // Show destination intelligence card when we've matched a destination.
         if (intent.destinationContext?.matched) {
           pushMessage(
@@ -163,16 +177,57 @@ function MissionPageInner() {
           );
         }
 
-        pushMessage(
-          makeMessage({
-            actor: "AGENT",
-            kind: "text",
-            text: intent.destinationContext?.matched
-              ? `Got it — ${intent.destinationContext.displayName} travel kit. Just a couple of questions.`
-              : "Got it — travel mission. Let me ask a few quick questions.",
-          })
-        );
-        await askNext(intent.missionCode, {});
+        // ── AUTONOMOUS PATH ──────────────────────────────────────────────────
+        if (inferenceResult?.canSkipAllQuestions) {
+          pushMessage(
+            makeMessage({
+              actor: "AGENT",
+              kind: "inference",
+              inference: inferenceResult,
+            })
+          );
+          pushMessage(
+            makeMessage({
+              actor: "AGENT",
+              kind: "text",
+              text: "Got everything I need — building your kit now…",
+            })
+          );
+          setStage("building");
+          const inferredAnswers: MissionAnswers = {
+            destinationType: inferenceResult.destinationType?.value,
+            durationDays: inferenceResult.durationDays?.value,
+            travellerType: inferenceResult.travellerType?.value,
+            sensitivities: inferenceResult.sensitivities?.value ?? [],
+            urgency: "flexible",
+          };
+          await buildPlanAndBundle(intent.missionCode, inferredAnswers);
+
+        // ── PARTIAL SKIP PATH ─────────────────────────────────────────────────
+        } else if (inferenceResult?.canSkipSomeQuestions) {
+          pushMessage(
+            makeMessage({
+              actor: "AGENT",
+              kind: "inference",
+              inference: inferenceResult,
+            })
+          );
+          const knownAnswers: MissionAnswers = buildKnownAnswers(inferenceResult);
+          await askNext(intent.missionCode, knownAnswers);
+
+        // ── FULL QUESTION FLOW (existing path) ────────────────────────────────
+        } else {
+          pushMessage(
+            makeMessage({
+              actor: "AGENT",
+              kind: "text",
+              text: intent.destinationContext?.matched
+                ? `Got it — ${intent.destinationContext.displayName} travel kit. Just a couple of questions.`
+                : "Got it — travel mission. Let me ask a few quick questions.",
+            })
+          );
+          await askNext(intent.missionCode, {});
+        }
       } catch (e) {
         setError((e as Error).message);
       } finally {
@@ -182,6 +237,20 @@ function MissionPageInner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
+
+  /** Build a MissionAnswers object pre-populated from high-confidence inference results. */
+  function buildKnownAnswers(ir: InferenceResult): MissionAnswers {
+    const known: MissionAnswers = {};
+    if (ir.destinationType && ir.destinationType.confidence >= 0.7)
+      known.destinationType = ir.destinationType.value;
+    if (ir.durationDays && ir.durationDays.confidence >= 0.7)
+      known.durationDays = ir.durationDays.value;
+    if (ir.travellerType && ir.travellerType.confidence >= 0.7)
+      known.travellerType = ir.travellerType.value;
+    // Sensitivities always pass through (even empty array skips the question)
+    if (ir.sensitivities) known.sensitivities = ir.sensitivities.value;
+    return known;
+  }
 
   const askNext = useCallback(
     async (code: MissionCode, nextAnswers: MissionAnswers) => {
@@ -416,6 +485,26 @@ function MissionPageInner() {
     );
   }, [pushMessage, reset]);
 
+  const handleSelectPersona = useCallback(
+    (query: string, persona: Persona) => {
+      // Show the persona card in the chat stream (labelled as Phase 2 simulation).
+      pushMessage(
+        makeMessage({
+          actor: "AGENT",
+          kind: "persona",
+          label: persona.label,
+          description: persona.description,
+          profileNote: persona.profileNote,
+          avatar: persona.avatar,
+        })
+      );
+      // Then submit the simulated query through the normal intent path.
+      handleIntent(query);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [handleIntent, pushMessage]
+  );
+
   // Pre-fill from ?q=
   useEffect(() => {
     if (prefill && stage === "intent" && !missionCode && !busy && messages.length <= 1) {
@@ -440,6 +529,7 @@ function MissionPageInner() {
           onAnswerQuestion={handleAnswer}
           onSkipQuestion={handleSkip}
           onRestart={handleRestart}
+          onSelectPersona={handleSelectPersona}
         />
         <BundlePanel
           bundle={bundle}

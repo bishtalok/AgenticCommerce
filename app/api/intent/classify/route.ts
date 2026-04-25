@@ -7,6 +7,7 @@ import { rateLimit } from "@/lib/rateLimit";
 import { classifyIntent } from "@/domain/agent/intentClassifier";
 import { isClinicalAdviceQuery, CLINICAL_ADVICE_REFUSAL } from "@/domain/agent/policyEngine";
 import { extractDestinationContext } from "@/domain/agent/destinationIntelligence";
+import { buildInferenceResult } from "@/domain/agent/queryIntelligence";
 import { logAuditEvent } from "@/services/auditService";
 
 export async function POST(req: NextRequest) {
@@ -41,6 +42,7 @@ export async function POST(req: NextRequest) {
 
     const result = classifyIntent(body.query);
     const destinationContext = extractDestinationContext(body.query);
+    const inferenceResult = buildInferenceResult(body.query, destinationContext);
 
     await logAuditEvent({
       sessionId,
@@ -50,10 +52,12 @@ export async function POST(req: NextRequest) {
         result,
         destinationMatched: destinationContext.matched,
         destinationKey: destinationContext.key || null,
+        autonomousPath: inferenceResult.canSkipAllQuestions,
+        inferenceConfidence: inferenceResult.overallConfidence,
       },
     });
 
-    return NextResponse.json({ ...result, destinationContext });
+    return NextResponse.json({ ...result, destinationContext, inferenceResult });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return errorResponse(

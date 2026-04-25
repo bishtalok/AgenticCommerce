@@ -9,6 +9,7 @@ import type {
   Bundle,
   BundleItem,
   BundleReasoning,
+  InferenceResult,
   QuestionDef,
   NextQuestion,
   FulfilmentMode,
@@ -20,7 +21,9 @@ export type ChatMessage =
   | { id: string; actor: "SYSTEM" | "AGENT" | "USER"; kind: "text"; text: string; at: number }
   | { id: string; actor: "AGENT"; kind: "question"; question: QuestionDef; at: number }
   | { id: string; actor: "AGENT"; kind: "refusal"; text: string; at: number }
-  | { id: string; actor: "AGENT"; kind: "destination"; context: DestinationContext; at: number };
+  | { id: string; actor: "AGENT"; kind: "destination"; context: DestinationContext; at: number }
+  | { id: string; actor: "AGENT"; kind: "inference"; inference: InferenceResult; at: number }
+  | { id: string; actor: "AGENT"; kind: "persona"; label: string; description: string; profileNote: string; avatar: string; at: number };
 
 export interface CartLine {
   sku: string;
@@ -46,6 +49,7 @@ interface MissionState {
   plan: TravelPlan | null;
   bundle: Bundle | null;
   reasoning: BundleReasoning | null;
+  inferenceResult: InferenceResult | null;
   priceBand: PriceBand | null;
   removedSkus: string[];
   basket: CartSnapshot | null;
@@ -63,6 +67,7 @@ interface MissionState {
   setPlan: (planId: string, plan: TravelPlan) => void;
   setBundle: (bundle: Bundle) => void;
   setReasoning: (reasoning: BundleReasoning | null) => void;
+  setInference: (inference: InferenceResult | null) => void;
   setPriceBand: (band: PriceBand) => void;
   removeSku: (sku: string) => void;
   restoreSku: (sku: string) => void;
@@ -81,6 +86,7 @@ const initial = {
   plan: null,
   bundle: null,
   reasoning: null as BundleReasoning | null,
+  inferenceResult: null as InferenceResult | null,
   priceBand: null,
   removedSkus: [] as string[],
   basket: null,
@@ -105,6 +111,7 @@ export const useMissionStore = create<MissionState>()(
         set({ planId, plan, priceBand: plan.constraints.priceBand }),
       setBundle: (bundle) => set({ bundle }),
       setReasoning: (reasoning) => set({ reasoning }),
+      setInference: (inferenceResult) => set({ inferenceResult }),
       setPriceBand: (priceBand) => set({ priceBand }),
       removeSku: (sku) =>
         set((s) => ({
@@ -131,6 +138,7 @@ export const useMissionStore = create<MissionState>()(
         plan: s.plan,
         bundle: s.bundle,
         reasoning: s.reasoning,
+        inferenceResult: s.inferenceResult,
         priceBand: s.priceBand,
         removedSkus: s.removedSkus,
         basket: s.basket,
@@ -149,7 +157,9 @@ type MessageDraft =
   | { actor: "SYSTEM" | "AGENT" | "USER"; kind: "text"; text: string }
   | { actor: "AGENT"; kind: "question"; question: QuestionDef }
   | { actor: "AGENT"; kind: "refusal"; text: string }
-  | { actor: "AGENT"; kind: "destination"; context: DestinationContext };
+  | { actor: "AGENT"; kind: "destination"; context: DestinationContext }
+  | { actor: "AGENT"; kind: "inference"; inference: InferenceResult }
+  | { actor: "AGENT"; kind: "persona"; label: string; description: string; profileNote: string; avatar: string };
 
 export function makeMessage(partial: MessageDraft): ChatMessage {
   const id =

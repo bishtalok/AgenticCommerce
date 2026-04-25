@@ -42,6 +42,14 @@ export async function POST(req: NextRequest) {
 
     const result = classifyIntent(body.query);
     const destinationContext = extractDestinationContext(body.query);
+
+    // If we matched a known destination the query is almost certainly travel-intent.
+    // Boost confidence to avoid false "low confidence" rejections on destination-named queries.
+    if (destinationContext.matched && result.confidence < 0.75) {
+      result.confidence = Math.max(result.confidence, 0.75);
+      if (!result.missionCode) result.missionCode = "TRAVEL";
+    }
+
     const inferenceResult = buildInferenceResult(body.query, destinationContext);
 
     await logAuditEvent({

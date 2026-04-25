@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Boots Ireland · Travel Mission</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #05054B;
+  --blue: #0055A4;
+  --sky: #E6F0FA;
+  --bg: #F7F7F5;
+  --white: #FFFFFF;
+  --border: #E4E4E7;
+  --muted: #71717A;
+  --radius: 12px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,0.14);
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--navy);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@keyframes fadeUp   { from { opacity:0; transform:translateY(10px);  } to { opacity:1; transform:translateY(0);   } }
+@keyframes fadeIn   { from { opacity:0; }                               to { opacity:1; }                           }
+@keyframes slideR   { from { opacity:0; transform:translateX(-8px);  } to { opacity:1; transform:translateX(0);   } }
+@keyframes pop      { from { opacity:0; transform:scale(0.94);       } to { opacity:1; transform:scale(1);        } }
+@keyframes pulse    { 0%,100%{opacity:.35;} 50%{opacity:1;} }
+@keyframes spin     { to { transform:rotate(360deg); } }
+@keyframes shimmer  { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+@keyframes gradAnim { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+.anim-fadeup  { animation: fadeUp  0.3s ease both; }
+.anim-fadein  { animation: fadeIn  0.25s ease both; }
+.anim-slider  { animation: slideR  0.25s ease both; }
+.anim-pop     { animation: pop     0.2s ease both; }
+
+.skeleton {
+  background: linear-gradient(90deg, #ECECEC 25%, #E0E0E0 50%, #ECECEC 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D4D4D8; border-radius: 4px; }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ─── TOKENS ───────────────────────────────────────────────────────────────────
+const T = {
+  navy:  '#05054B',
+  blue:  '#0055A4',
+  sky:   '#E6F0FA',
+  bg:    '#F7F7F5',
+  white: '#FFFFFF',
+  border:'#E4E4E7',
+  muted: '#71717A',
+  green: '#059669',
+  amber: '#D97706',
+  red:   '#DC2626',
+};
+
+// ─── DEMO DATA ────────────────────────────────────────────────────────────────
+const QUESTIONS = [
+  { id:'q1', text:'What type of holiday is this?', options:['Beach / Sun','City Break','Adventure / Hiking','Mixed'] },
+  { id:'q2', text:'Who\'s travelling?',           options:['Solo','Couple','Family with kids','Group of friends'] },
+  { id:'q3', text:'Any sensitivities we should know about?', options:['None','Fragrance-free','Nut allergy','Sensitive skin'] },
+];
+
+const BUNDLE = [
+  { sku:'SPF50-400',  name:'Soltan Kids SPF50+ Spray 400ml',          brand:'Soltan',        cat:'Sun care',           qty:2, price:9.99,  why:'SPF50+ for fair-skinned children in Mediterranean sun',       tag:'Essential' },
+  { sku:'AFTSUN-200', name:'Soltan After Sun Soothing Lotion 200ml',   brand:'Soltan',        cat:'Sun care',           qty:1, price:6.49,  why:'Post-beach recovery for sensitive skin',                      tag:'Recommended' },
+  { sku:'INSECT-MAX', name:'Jungle Formula Maximum Insect Repellent',  brand:'Jungle Formula',cat:'Insect protection',  qty:1, price:8.99,  why:'Summer mosquito protection for Spain coastal areas',          tag:'Essential' },
+  { sku:'NURO-CHILD', name:'Nurofen for Children Oral Suspension',     brand:'Nurofen',       cat:'First aid',          qty:1, price:7.29,  why:'Fever & pain relief for children under 12',                   tag:'Essential' },
+  { sku:'DIOR-6PK',   name:'Dioralyte Sachets Blackcurrant ×6',        brand:'Dioralyte',     cat:'Hydration',          qty:1, price:4.99,  why:'Rehydration for heat exposure or tummy upsets',               tag:'Recommended' },
+  { sku:'PLSTR-40',   name:'Boots Waterproof Plasters 40 Pack',        brand:'Boots',         cat:'First aid',          qty:1, price:3.49,  why:'Waterproof adhesive — ideal for beach holidays',              tag:'Recommended' },
+  { sku:'CAREX-100',  name:'Carex Hand Sanitiser Gel 100ml ×2',        brand:'Carex',         cat:'Hygiene',            qty:2, price:2.99,  why:'Essential travel hygiene — TSA-compliant size',               tag:'Standard' },
+];
+
+const PERSONAS = [
+  { label:'Family holiday',  avatar:'👨‍👩‍👧', query:'Family beach holiday Spain 2 weeks, kids aged 5 and 8',  desc:'Spain · 2 wks · Kids' },
+  { label:'Solo backpacker', avatar:'🧳',      query:'Solo backpacking South East Asia 3 months',               desc:'SEA · 3 months · Solo' },
+  { label:'City break',      avatar:'🗺️',     query:'Romantic city break Rome 4 days next month',              desc:'Rome · 4 days · Couple' },
+];
+
+// ─── SHARED UI ────────────────────────────────────────────────────────────────
+function Dots() {
+  return (
+    <div style={{ display:'flex', gap:4, alignItems:'center' }}>
+      {[0,1,2].map(i => (
+        <span key={i} style={{
+          width:6, height:6, borderRadius:'50%', background:T.blue, display:'inline-block',
+          animation:`pulse 1.2s ease-in-out ${i*0.18}s infinite`,
+        }} />
+      ))}
+    </div>
+  );
+}
+
+function Spinner({ color='white' }) {
+  return (
+    <span style={{
+      display:'inline-block', width:15, height:15,
+      border:`2px solid ${color}40`, borderTopColor:color,
+      borderRadius:'50%', animation:'spin 0.65s linear infinite',
+    }} />
+  );
+}
+
+function Badge({ children, variant='blue' }) {
+  const map = {
+    blue:  { bg:'#EFF6FF', fg:'#1D4ED8' },
+    green: { bg:'#F0FDF4', fg:'#166534' },
+    amber: { bg:'#FFFBEB', fg:'#92400E' },
+    gray:  { bg:'#F4F4F5', fg:'#52525B' },
+    navy:  { bg:T.sky,     fg:T.navy    },
+  };
+  const c = map[variant] || map.gray;
+  return (
+    <span style={{
+      background:c.bg, color:c.fg, fontSize:10, fontWeight:700,
+      padding:'2px 8px', borderRadius:20, letterSpacing:'0.04em',
+      textTransform:'uppercase', display:'inline-block', whiteSpace:'nowrap',
+    }}>{children}</span>
+  );
+}
+
+function Btn({ children, variant='primary', size='md', disabled, onClick, fullWidth, style:sx }) {
+  const [hov, setHov] = useState(false);
+  const sizes = { sm:{ padding:'7px 14px', fontSize:12 }, md:{ padding:'10px 22px', fontSize:13 }, lg:{ padding:'13px 30px', fontSize:14 } };
+  const variants = {
+    primary:  { bg:T.navy,  fg:T.white,  hbg:T.blue },
+    blue:     { bg:T.blue,  fg:T.white,  hbg:'#0046A0' },
+    ghost:    { bg:'transparent', fg:T.muted, hbg:'#F4F4F5' },
+    outline:  { bg:'transparent', fg:T.navy, border:`1.5px solid ${T.border}`, hbg:T.sky },
+    danger:   { bg:'#FEF2F2', fg:T.red, hbg:'#FEE2E2' },
+    glass:    { bg:'rgba(255,255,255,0.12)', fg:'white', border:'1px solid rgba(255,255,255,0.2)', hbg:'rgba(255,255,255,0.2)' },
+  };
+  const v = variants[variant] || variants.primary;
+  return (
+    <button
+      disabled={disabled} onClick={onClick}
+      onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+      style={{
+        ...sizes[size], fontFamily:'inherit', fontWeight:700,
+        background: hov && !disabled ? v.hbg : v.bg,
+        color: v.fg, border: v.border || 'none',
+        borderRadius:10, cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1, transition:'all 0.15s ease',
+        display:'inline-flex', alignItems:'center', justifyContent:'center', gap:6,
+        letterSpacing:'-0.01em', width: fullWidth ? '100%' : undefined,
+        boxShadow: variant==='primary' && !disabled ? '0 1px 3px rgba(0,0,0,0.15)' : 'none',
+        ...sx,
+      }}
+    >{children}</button>
+  );
+}
+
+// ─── NAV ──────────────────────────────────────────────────────────────────────
+function Nav({ onHome, slim }) {
+  return (
+    <header style={{ background:T.white, borderBottom:`1px solid ${T.border}`, position:'sticky', top:0, zIndex:100 }}>
+      <div style={{
+        maxWidth: slim ? '100%' : 1120, margin:'0 auto',
+        padding: slim ? '0 0 0 20px' : '0 32px',
+        height:54, display:'flex', alignItems:'center', justifyContent:'space-between',
+      }}>
+        <button onClick={onHome} style={{
+          display:'flex', alignItems:'center', gap:9, background:'none', border:'none',
+          cursor:'pointer', fontFamily:'inherit', padding:0,
+        }}>
+          <span style={{
+            background:T.navy, color:T.white, fontWeight:800,
+            fontSize:13, letterSpacing:'-0.03em', padding:'4px 10px', borderRadius:6,
+          }}>boots</span>
+          <span style={{ fontSize:12, color:T.muted, fontWeight:500 }}>Ireland</span>
+        </button>
+        <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+          <span style={{
+            fontSize:10, fontWeight:700, letterSpacing:'0.08em',
+            textTransform:'uppercase', color:T.blue,
+            background:'#EFF6FF', padding:'3px 10px', borderRadius:20,
+          }}>Agentic Demo</span>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function Banner() {
+  return (
+    <div style={{
+      background:T.sky, borderBottom:`1px solid #BFD7ED`,
+      padding:'7px 20px', textAlign:'center', fontSize:12, color:T.navy, fontWeight:500,
+      display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+    }}>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      Not medical advice — always consult a Boots pharmacist before travel.
+    </div>
+  );
+}
+
+// ─── HOME PAGE ────────────────────────────────────────────────────────────────
+function HomePage({ onStart, onDemo, tweaks }) {
+  const accentColor = tweaks.accentColor || T.blue;
+
+  return (
+    <div style={{ minHeight:'100vh', background:T.bg }}>
+      <Nav onHome={() => {}} />
+
+      {/* Hero */}
+      <div style={{
+        background:`linear-gradient(140deg, ${T.navy} 0%, #080860 45%, #063070 100%)`,
+        padding:'80px 32px 88px', position:'relative', overflow:'hidden',
+      }}>
+        {/* Orbs */}
+        {[
+          { r:420, x:'72%', y:'-30%', o:0.18 },
+          { r:240, x:'88%', y:'60%',  o:0.12 },
+          { r:160, x:'55%', y:'80%',  o:0.08 },
+        ].map((orb,i) => (
+          <div key={i} style={{
+            position:'absolute', width:orb.r, height:orb.r, borderRadius:'50%',
+            background:accentColor, opacity:orb.o,
+            left:orb.x, top:orb.y, transform:'translate(-50%,-50%)',
+            filter:'blur(40px)', pointerEvents:'none',
+          }} />
+        ))}
+
+        <div style={{ maxWidth:1120, margin:'0 auto', position:'relative' }}>
+          <div style={{ maxWidth:600, animation:'fadeUp 0.5s ease both' }}>
+            <div style={{
+              display:'inline-flex', alignItems:'center', gap:8,
+              background:'rgba(255,255,255,0.1)', backdropFilter:'blur(12px)',
+              border:'1px solid rgba(255,255,255,0.18)',
+              borderRadius:24, padding:'5px 14px 5px 6px', marginBottom:28,
+            }}>
+              <span style={{
+                background:accentColor, color:'white', borderRadius:16,
+                fontSize:9, fontWeight:800, padding:'2px 8px',
+                letterSpacing:'0.07em', textTransform:'uppercase',
+              }}>NEW</span>
+              <span style={{ color:'rgba(255,255,255,0.8)', fontSize:12, fontWeight:500 }}>
+                Agentic shopping — Boots Ireland
+              </span>
+            </div>
+
+            <h1 style={{
+              fontSize: tweaks.heroSize || 56, fontWeight:800, color:'white',
+              lineHeight:1.08, letterSpacing:'-0.035em', marginBottom:22,
+              textWrap:'balance',
+            }}>
+              Pack smart.<br />Travel well.
+            </h1>
+
+            <p style={{
+              fontSize:17, color:'rgba(255,255,255,0.65)', lineHeight:1.65,
+              marginBottom:40, fontWeight:400, maxWidth:460,
+            }}>
+              Tell us about your trip. We'll assemble a governed travel health kit in under 90 seconds — with a clear reason for every item.
+            </p>
+
+            <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
+              <Btn size="lg" onClick={onStart}
+                sx={{ background:'white', color:T.navy, boxShadow:'0 4px 24px rgba(0,0,0,0.25)' }}
+              >
+                Start travel mission →
+              </Btn>
+              <Btn variant="glass" size="lg" onClick={onDemo}>
+                Watch demo flow
+              </Btn>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Feature strip */}
+      <div style={{ background:T.white, borderBottom:`1px solid ${T.border}`, padding:'14px 32px' }}>
+        <div style={{ maxWidth:1120, margin:'0 auto', display:'flex', gap:36, flexWrap:'wrap', alignItems:'center' }}>
+          {[
+            ['⚡','Under 90 seconds'],
+            ['🛡️','Governed recommendations'],
+            ['💬','Natural language intent'],
+            ['🏪','Click & Collect or Delivery'],
+            ['✅','Explicit checkout approval'],
+          ].map(([icon, label]) => (
+            <div key={label} style={{ display:'flex', alignItems:'center', gap:7 }}>
+              <span style={{ fontSize:15 }}>{icon}</span>
+              <span style={{ fontSize:12, fontWeight:600, color:T.navy }}>{label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Cards */}
+      <div style={{ maxWidth:1120, margin:'0 auto', padding:'60px 32px' }}>
+        <p style={{ fontSize:12, fontWeight:700, letterSpacing:'0.08em', textTransform:'uppercase', color:T.muted, marginBottom:12 }}>
+          How it works
+        </p>
+        <h2 style={{ fontSize:30, fontWeight:800, color:T.navy, letterSpacing:'-0.03em', marginBottom:40 }}>
+          Three steps to your travel kit
+        </h2>
+
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(260px,1fr))', gap:20 }}>
+          {[
+            { num:'01', title:'Describe your trip', desc:'Type your trip naturally — destination, duration, who\'s going. No forms, no dropdowns.', color:accentColor },
+            { num:'02', title:'Answer 2–4 questions', desc:'We ask only what we need. Destination type, travellers, sensitivities. Done in under a minute.', color:'#059669' },
+            { num:'03', title:'Review & approve', desc:'Every item shown with an explicit reason. Remove anything you don\'t need, then approve to basket.', color:'#7C3AED' },
+          ].map(card => (
+            <div key={card.num} style={{
+              background:T.white, borderRadius:16, padding:28,
+              border:`1px solid ${T.border}`, boxShadow:'0 1px 4px rgba(0,0,0,0.04)',
+              transition:'box-shadow 0.2s, transform 0.2s',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.08)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.04)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            >
+              <div style={{
+                width:44, height:44, borderRadius:12, background:`${card.color}15`,
+                display:'flex', alignItems:'center', justifyContent:'center', marginBottom:18,
+              }}>
+                <span style={{ fontSize:15, fontWeight:800, color:card.color }}>{card.num}</span>
+              </div>
+              <h3 style={{ fontSize:16, fontWeight:700, color:T.navy, marginBottom:8, letterSpacing:'-0.02em' }}>
+                {card.title}
+              </h3>
+              <p style={{ fontSize:13, color:T.muted, lineHeight:1.6 }}>{card.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── CHAT BUBBLE ──────────────────────────────────────────────────────────────
+function Bubble({ actor, children, delay=0, noAvatar }) {
+  const isUser = actor === 'USER';
+  return (
+    <div style={{
+      display:'flex', justifyContent: isUser ? 'flex-end' : 'flex-start',
+      alignItems:'flex-end', gap:8,
+      animation:`fadeUp 0.25s ${delay}ms ease both`,
+    }}>
+      {!isUser && !noAvatar && (
+        <div style={{
+          width:28, height:28, borderRadius:'50%', background:T.navy,
+          display:'flex', alignItems:'center', justifyContent:'center',
+          fontSize:11, fontWeight:800, color:'white', flexShrink:0,
+          letterSpacing:'-0.03em',
+        }}>B</div>
+      )}
+      {!isUser && noAvatar && <div style={{ width:28, flexShrink:0 }} />}
+      <div style={{
+        maxWidth:'80%', padding:'10px 14px',
+        borderRadius: isUser ? '16px 16px 4px 16px' : '4px 16px 16px 16px',
+        background: isUser ? T.navy : T.white,
+        color: isUser ? 'white' : T.navy,
+        fontSize:13, lineHeight:1.6, fontWeight:400,
+        boxShadow: isUser ? 'none' : '0 1px 4px rgba(0,0,0,0.06)',
+        border: isUser ? 'none' : `1px solid ${T.border}`,
+      }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─── OPTION PILLS ─────────────────────────────────────────────────────────────
+function OptionPills({ options, onSelect, disabled }) {
+  const [hov, setHov] = useState(null);
+  return (
+    <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginTop:8 }}>
+      {options.map(opt => (
+        <button key={opt} onClick={() => !disabled && onSelect(opt)}
+          onMouseEnter={() => setHov(opt)} onMouseLeave={() => setHov(null)}
+          style={{
+            padding:'8px 16px', borderRadius:20, fontSize:12, fontWeight:600,
+            border:`1.5px solid ${hov===opt && !disabled ? T.blue : T.border}`,
+            background: hov===opt && !disabled ? T.sky : T.white,
+            color:T.navy, cursor: disabled ? 'not-allowed' : 'pointer',
+            fontFamily:'inherit', transition:'all 0.12s', opacity: disabled ? 0.5 : 1,
+          }}
+        >{opt}</button>
+      ))}
+    </div>
+  );
+}
+
+// ─── BUNDLE ITEM ──────────────────────────────────────────────────────────────
+function BundleRow({ item, onRemove, animDelay=0, removed }) {
+  const tagVariant = { Essential:'blue', Recommended:'green', Standard:'gray' };
+  const [hov, setHov] = useState(false);
+  if (removed) return null;
+  return (
+    <div style={{
+      background:T.white, borderRadius:12, padding:'13px 15px',
+      border:`1px solid ${T.border}`, boxShadow:'0 1px 3px rgba(0,0,0,0.04)',
+      animation:`fadeUp 0.3s ${animDelay}ms ease both`,
+      transition:'opacity 0.2s', opacity: removed ? 0 : 1,
+    }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:8, marginBottom:6 }}>
+        <div style={{ flex:1 }}>
+          <p style={{ fontSize:12, fontWeight:700, color:T.navy, lineHeight:1.35, marginBottom:2 }}>{item.name}</p>
+          <p style={{ fontSize:11, color:T.muted }}>{item.brand} · {item.cat} · qty {item.qty}</p>
+        </div>
+        <p style={{ fontSize:13, fontWeight:700, color:T.navy, whiteSpace:'nowrap' }}>
+          €{(item.price*item.qty).toFixed(2)}
+        </p>
+      </div>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:6, flex:1, minWidth:0 }}>
+          <Badge variant={tagVariant[item.tag]||'gray'}>{item.tag}</Badge>
+          <span style={{ fontSize:11, color:T.muted, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+            {item.why}
+          </span>
+        </div>
+        <button onClick={() => onRemove(item.sku)}
+          onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)}
+          style={{
+            background:'none', border:'none', cursor:'pointer', fontFamily:'inherit',
+            fontSize:11, fontWeight:600, color:T.red, padding:'2px 6px', borderRadius:4,
+            opacity: hov ? 1 : 0.6, transition:'opacity 0.15s', flexShrink:0,
+          }}
+        >Remove</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── BUNDLE PANEL ─────────────────────────────────────────────────────────────
+function BundlePanel({ items, removedSkus, stage, onRemove, onCheckout }) {
+  const [tab, setTab] = useState('kit');
+  const visible = items.filter(i => !removedSkus.has(i.sku));
+  const total = visible.reduce((s,i) => s + i.price*i.qty, 0);
+  const isReady = stage === 'ready';
+
+  return (
+    <aside style={{
+      display:'flex', flexDirection:'column',
+      borderLeft:`1px solid ${T.border}`, background:'#FAFAF8',
+      overflow:'hidden',
+    }}>
+      {/* Panel header */}
+      <div style={{
+        padding:'16px 20px', borderBottom:`1px solid ${T.border}`,
+        background:T.white, flexShrink:0,
+      }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:3 }}>
+          <h2 style={{ fontSize:14, fontWeight:700, color:T.navy, letterSpacing:'-0.02em' }}>
+            Your travel kit
+          </h2>
+          {isReady && (
+            <span style={{ fontSize:15, fontWeight:800, color:T.navy }}>
+              €{total.toFixed(2)}
+            </span>
+          )}
+        </div>
+        <p style={{ fontSize:11, color:T.muted }}>
+          {isReady ? `${visible.length} of ${items.length} items` : 'Waiting for your answers…'}
+        </p>
+
+        {isReady && (
+          <div style={{ display:'flex', gap:3, marginTop:12, background:'#F4F4F5', borderRadius:9, padding:3 }}>
+            {[['kit','🧳 Kit'],['why','💡 Why?']].map(([id,label]) => (
+              <button key={id} onClick={() => setTab(id)} style={{
+                flex:1, padding:'6px 0', borderRadius:7, border:'none',
+                fontSize:11, fontWeight:700, cursor:'pointer', fontFamily:'inherit', transition:'all 0.15s',
+                background: tab===id ? T.white : 'transparent',
+                color: tab===id ? T.navy : T.muted,
+                boxShadow: tab===id ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+              }}>{label}</button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Panel body */}
+      <div style={{ flex:1, overflowY:'auto', padding:16 }}>
+        {/* Empty */}
+        {!isReady && stage !== 'building' && (
+          <div style={{
+            display:'flex', flexDirection:'column', alignItems:'center',
+            justifyContent:'center', height:'100%', gap:14, padding:32, textAlign:'center',
+          }}>
+            <div style={{
+              width:60, height:60, borderRadius:18, background:T.sky,
+              display:'flex', alignItems:'center', justifyContent:'center', fontSize:26,
+            }}>🧳</div>
+            <div>
+              <p style={{ fontSize:14, fontWeight:700, color:T.navy, marginBottom:6 }}>No kit yet</p>
+              <p style={{ fontSize:12, color:T.muted, lineHeight:1.6 }}>
+                Answer a few quick questions and we'll build a personalised travel health kit — every item governed and explained.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Skeleton */}
+        {stage === 'building' && (
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            {[88,70,88,70,70,70].map((h,i) => (
+              <div key={i} className="skeleton" style={{ height:h, opacity: Math.max(0.2, 0.7-i*0.08) }} />
+            ))}
+          </div>
+        )}
+
+        {/* Kit tab */}
+        {isReady && tab==='kit' && (
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            {items.map((item,i) => (
+              <BundleRow
+                key={item.sku} item={item}
+                removed={removedSkus.has(item.sku)}
+                onRemove={onRemove} animDelay={i*50}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Why tab */}
+        {isReady && tab==='why' && (
+          <div style={{ display:'flex', flexDirection:'column', gap:12, animation:'fadeIn 0.2s ease' }}>
+            <div style={{
+              background:T.white, borderRadius:12, padding:16,
+              border:`1px solid ${T.border}`, fontSize:13, lineHeight:1.65, color:T.navy,
+            }}>
+              <p style={{ fontWeight:700, marginBottom:8 }}>Kit reasoning</p>
+              <p style={{ color:T.muted }}>
+                Based on a <strong style={{color:T.navy}}>2-week beach holiday in Spain</strong> for a family with children aged 5–8. High UV index coastal destination — SPF50+ products prioritised. Sensitive skin profile applied: fragrance-free formulations selected where available in Boots inventory.
+              </p>
+            </div>
+            <div style={{
+              background:'#FFFBEB', borderRadius:12, padding:16,
+              border:'1px solid #FDE68A', fontSize:12, color:'#92400E', lineHeight:1.6,
+            }}>
+              <p style={{ fontWeight:700, marginBottom:4 }}>⚠️ Pharmacist note</p>
+              <p>Children's medications included. Consult a Boots pharmacist for dosage advice specific to your child's age and weight.</p>
+            </div>
+            <div style={{
+              background:'#F0FDF4', borderRadius:12, padding:16,
+              border:'1px solid #A7F3D0', fontSize:12, color:'#065F46', lineHeight:1.6,
+            }}>
+              <p style={{ fontWeight:700, marginBottom:4 }}>✅ Governance check</p>
+              <p>All {items.length} items are validated Boots-stocked SKUs. Price band: mid-range. Substitutions applied where better value alternatives exist.</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div style={{ padding:'16px 20px', borderTop:`1px solid ${T.border}`, background:T.white, flexShrink:0 }}>
+        <button
+          onClick={onCheckout}
+          disabled={!isReady || visible.length===0}
+          style={{
+            width:'100%', padding:'13px 0', borderRadius:10, border:'none',
+            background: isReady && visible.length>0 ? T.navy : T.border,
+            color: isReady && visible.length>0 ? 'white' : T.muted,
+            fontSize:13, fontWeight:700, cursor: isReady && visible.length>0 ? 'pointer' : 'not-allowed',
+            fontFamily:'inherit', letterSpacing:'-0.01em', transition:'background 0.15s',
+          }}
+          onMouseEnter={e => { if (isReady) e.target.style.background = T.blue; }}
+          onMouseLeave={e => { if (isReady) e.target.style.background = T.navy; }}
+        >
+          {isReady && visible.length>0
+            ? `Add ${visible.length} items to basket →`
+            : 'Complete the conversation first'}
+        </button>
+        {isReady && visible.length>0 && (
+          <p style={{ fontSize:11, color:T.muted, textAlign:'center', marginTop:8 }}>
+            You'll review everything before payment
+          </p>
+        )}
+      </div>
+    </aside>
+  );
+}
+
+// ─── MISSION PAGE ─────────────────────────────────────────────────────────────
+function MissionPage({ onHome, autoRun }) {
+  const [msgs, setMsgs]           = useState([]);
+  const [stage, setStage]         = useState('intent');
+  const [draft, setDraft]         = useState('');
+  const [busy, setBusy]           = useState(false);
+  const [activeQ, setActiveQ]     = useState(null);   // index into QUESTIONS
+  const [bundleItems, setBundleItems] = useState([]);
+  const [removedSkus, setRemovedSkus] = useState(new Set());
+  const scrollRef = useRef(null);
+  const didAutoRun = useRef(false);
+
+  const addMsg = useCallback((m) => setMsgs(p => [...p, { id: crypto.randomUUID(), ...m }]), []);
+  const sleep  = ms => new Promise(r => setTimeout(r, ms));
+
+  useEffect(() => {
+    addMsg({ actor:'AGENT', kind:'text', text:'Hi! I\'m your Boots travel assistant. Tell me about your trip and I\'ll assemble a governed health & essentials kit — with a clear reason for every item.' });
+  }, []);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [msgs]);
+
+  // Auto-run demo flow
+  useEffect(() => {
+    if (autoRun && !didAutoRun.current) {
+      didAutoRun.current = true;
+      setTimeout(() => runFlow('Family beach holiday Spain 2 weeks, kids aged 5 and 8'), 600);
+    }
+  }, [autoRun]);
+
+  async function runFlow(query) {
+    if (busy) return;
+    setBusy(true);
+    setStage('chat');
+    addMsg({ actor:'USER', kind:'text', text:query });
+    await sleep(900);
+    addMsg({ actor:'AGENT', kind:'text', text:'Spain — lovely choice ☀️  I can see you\'re heading somewhere warm. Just a couple of quick questions to tailor your kit.' });
+    await sleep(700);
+    addMsg({ actor:'AGENT', kind:'question', qIdx:0 });
+    setActiveQ(0);
+    setBusy(false);
+  }
+
+  async function handleOption(opt, qIdx) {
+    if (busy) return;
+    setBusy(true);
+    setActiveQ(null);
+    addMsg({ actor:'USER', kind:'text', text:opt });
+    await sleep(450);
+    const next = qIdx + 1;
+    if (next < QUESTIONS.length) {
+      addMsg({ actor:'AGENT', kind:'question', qIdx:next });
+      setActiveQ(next);
+      setBusy(false);
+    } else {
+      addMsg({ actor:'AGENT', kind:'text', text:'Perfect — building your personalised kit now!' });
+      setStage('building');
+      setBusy(false);
+      await sleep(2800);
+      setBundleItems(BUNDLE);
+      setStage('ready');
+      addMsg({ actor:'AGENT', kind:'text', text:`Done! I've assembled ${BUNDLE.length} items for a 2-week family beach holiday in Spain. Review the kit on the right — remove anything you don't need, then add to basket.` });
+    }
+  }
+
+  function handleSubmit() {
+    const q = draft.trim();
+    if (!q || busy || q.length < 3) return;
+    setDraft('');
+    runFlow(q);
+  }
+
+  function handleRemove(sku) {
+    setRemovedSkus(prev => new Set([...prev, sku]));
+  }
+
+  function handleRestart() {
+    setMsgs([]);
+    setStage('intent');
+    setBusy(false);
+    setActiveQ(null);
+    setBundleItems([]);
+    setRemovedSkus(new Set());
+    setDraft('');
+    didAutoRun.current = false;
+    setTimeout(() => addMsg({ actor:'AGENT', kind:'text', text:'Fresh start — tell me about your next trip!' }), 50);
+  }
+
+  const inputDisabled = stage !== 'intent' || busy;
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', height:'100vh', overflow:'hidden' }}>
+      <Nav onHome={onHome} slim />
+      <Banner />
+
+      <div style={{
+        flex:1, display:'grid',
+        gridTemplateColumns:'1fr 390px',
+        minHeight:0, overflow:'hidden',
+      }}>
+        {/* ── Chat ── */}
+        <section style={{ display:'flex', flexDirection:'column', background:T.white, overflow:'hidden' }}>
+          {/* Chat header */}
+          <div style={{
+            padding:'13px 20px', borderBottom:`1px solid ${T.border}`,
+            display:'flex', alignItems:'center', justifyContent:'space-between', flexShrink:0,
+          }}>
+            <div>
+              <p style={{ fontSize:14, fontWeight:700, color:T.navy, letterSpacing:'-0.02em' }}>Travel mission</p>
+              <p style={{ fontSize:11, color:T.muted, marginTop:1 }}>
+                {stage==='intent' && 'Describe your trip to begin'}
+                {stage==='chat'   && 'Answering questions…'}
+                {stage==='building'&&'Building your kit…'}
+                {stage==='ready'  && 'Kit ready — review on the right'}
+              </p>
+            </div>
+            <button onClick={handleRestart} style={{
+              fontSize:11, fontWeight:600, color:T.muted, background:'none', border:'none',
+              cursor:'pointer', fontFamily:'inherit', padding:'4px 8px', borderRadius:6,
+              transition:'color 0.15s',
+            }}
+              onMouseEnter={e=>e.target.style.color=T.navy}
+              onMouseLeave={e=>e.target.style.color=T.muted}
+            >Start over</button>
+          </div>
+
+          {/* Messages */}
+          <div ref={scrollRef} style={{
+            flex:1, overflowY:'auto', padding:'20px 20px 8px',
+            display:'flex', flexDirection:'column', gap:12,
+          }}>
+            {msgs.map((m, mi) => {
+              if (m.kind === 'question') {
+                const q = QUESTIONS[m.qIdx];
+                const isActive = activeQ === m.qIdx && !busy;
+                return (
+                  <div key={m.id} style={{ display:'flex', flexDirection:'column', gap:0 }}>
+                    <Bubble actor="AGENT" delay={0}>
+                      <span style={{
+                        display:'block', fontSize:10, fontWeight:700, color:T.blue,
+                        letterSpacing:'0.06em', textTransform:'uppercase', marginBottom:4,
+                      }}>Question {m.qIdx+1} of {QUESTIONS.length}</span>
+                      {q.text}
+                    </Bubble>
+                    {isActive && (
+                      <div style={{ marginLeft:36, animation:'fadeUp 0.2s ease' }}>
+                        <OptionPills options={q.options} onSelect={opt=>handleOption(opt, m.qIdx)} disabled={busy} />
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+              return (
+                <Bubble key={m.id} actor={m.actor} delay={0}>{m.text}</Bubble>
+              );
+            })}
+
+            {/* Typing indicator */}
+            {busy && (
+              <div style={{ display:'flex', gap:8, alignItems:'flex-end', animation:'fadeIn 0.2s ease' }}>
+                <div style={{
+                  width:28, height:28, borderRadius:'50%', background:T.navy,
+                  display:'flex', alignItems:'center', justifyContent:'center',
+                  fontSize:11, fontWeight:800, color:'white', flexShrink:0,
+                }}>B</div>
+                <div style={{
+                  background:T.white, border:`1px solid ${T.border}`, boxShadow:'0 1px 4px rgba(0,0,0,0.06)',
+                  borderRadius:'4px 16px 16px 16px', padding:'11px 14px',
+                }}>
+                  <Dots />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Input area */}
+          <div style={{
+            borderTop:`1px solid ${T.border}`, padding:'16px 20px',
+            background:'#FAFAF8', flexShrink:0,
+          }}>
+            {stage === 'intent' ? (
+              <>
+                <div style={{ display:'flex', gap:8 }}>
+                  <input
+                    value={draft} onChange={e=>setDraft(e.target.value)}
+                    onKeyDown={e=>e.key==='Enter' && handleSubmit()}
+                    disabled={inputDisabled}
+                    placeholder="e.g. family beach holiday Thailand, 2 weeks"
+                    style={{
+                      flex:1, padding:'10px 14px', borderRadius:10, fontSize:13,
+                      border:`1.5px solid ${T.border}`, fontFamily:'inherit',
+                      background:T.white, color:T.navy, outline:'none',
+                      transition:'border-color 0.15s',
+                    }}
+                    onFocus={e=>e.target.style.borderColor=T.blue}
+                    onBlur={e=>e.target.style.borderColor=T.border}
+                  />
+                  <Btn onClick={handleSubmit} disabled={busy||draft.length<3}>
+                    {busy ? <Spinner /> : 'Start'}
+                  </Btn>
+                </div>
+
+                <div style={{ marginTop:14 }}>
+                  <p style={{
+                    fontSize:10, fontWeight:700, color:T.muted, marginBottom:9,
+                    letterSpacing:'0.07em', textTransform:'uppercase',
+                  }}>Try a demo persona</p>
+                  <div style={{ display:'flex', gap:8 }}>
+                    {PERSONAS.map(p => (
+                      <button key={p.label} onClick={()=>runFlow(p.query)} style={{
+                        display:'flex', alignItems:'center', gap:7,
+                        padding:'8px 12px', borderRadius:10,
+                        border:`1.5px solid ${T.border}`, background:T.white,
+                        cursor:'pointer', fontFamily:'inherit', transition:'all 0.13s',
+                      }}
+                        onMouseEnter={e=>{e.currentTarget.style.borderColor=T.blue; e.currentTarget.style.background=T.sky;}}
+                        onMouseLeave={e=>{e.currentTarget.style.borderColor=T.border; e.currentTarget.style.background=T.white;}}
+                      >
+                        <span style={{ fontSize:18 }}>{p.avatar}</span>
+                        <div style={{ textAlign:'left' }}>
+                          <p style={{ fontSize:12, fontWeight:700, color:T.navy }}>{p.label}</p>
+                          <p style={{ fontSize:10, color:T.muted }}>{p.desc}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div style={{
+                padding:'10px 14px', borderRadius:10, background:T.white,
+                border:`1px solid ${T.border}`, fontSize:12, color:T.muted,
+                display:'flex', alignItems:'center', gap:8,
+              }}>
+                {stage==='building' ? <><Spinner color={T.blue} /><span style={{color:T.navy,fontWeight:600}}>Assembling your travel kit…</span></>
+                  : stage==='ready' ? '✅ Kit ready — review on the right and add to basket.'
+                  : 'Select an option above to continue…'}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ── Bundle Panel ── */}
+        <BundlePanel
+          items={bundleItems} removedSkus={removedSkus} stage={stage}
+          onRemove={handleRemove}
+          onCheckout={() => alert('Demo: Would proceed to Boots checkout with a consent & approval step before payment.')}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ─── CHECKOUT CONFIRM SCREEN ──────────────────────────────────────────────────
+function CheckoutPage({ onHome }) {
+  return (
+    <div style={{ minHeight:'100vh', background:T.bg }}>
+      <Nav onHome={onHome} />
+      <div style={{
+        maxWidth:520, margin:'80px auto', padding:'0 24px', textAlign:'center',
+        animation:'fadeUp 0.4s ease',
+      }}>
+        <div style={{
+          width:72, height:72, borderRadius:20, background:'#F0FDF4',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          fontSize:32, margin:'0 auto 24px',
+        }}>✅</div>
+        <h1 style={{ fontSize:28, fontWeight:800, color:T.navy, letterSpacing:'-0.03em', marginBottom:12 }}>
+          Order confirmed!
+        </h1>
+        <p style={{ fontSize:15, color:T.muted, lineHeight:1.6, marginBottom:32 }}>
+          Your travel kit has been added to your Boots basket. You'll receive an email confirmation with your Click & Collect details.
+        </p>
+        <Btn onClick={onHome} size="lg" fullWidth>Back to home</Btn>
+      </div>
+    </div>
+  );
+}
+
+// ─── ROOT APP ─────────────────────────────────────────────────────────────────
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "heroSize": 56,
+  "accentColor": "#0055A4",
+  "roundness": 12,
+  "showFeatureStrip": true
+}/*EDITMODE-END*/;
+
+function App() {
+  const [page, setPage]       = useState('home');
+  const [autoRun, setAutoRun] = useState(false);
+  const [tweaks, setTweak]    = useTweaks(TWEAK_DEFAULTS);
+
+  return (
+    <>
+      {page==='home'     && <HomePage onStart={()=>{setAutoRun(false); setPage('mission');}} onDemo={()=>{setAutoRun(true); setPage('mission');}} tweaks={tweaks} />}
+      {page==='mission'  && <MissionPage onHome={()=>setPage('home')} autoRun={autoRun} />}
+      {page==='checkout' && <CheckoutPage onHome={()=>setPage('home')} />}
+
+      <TweaksPanel>
+        <TweakSection label="Hero" />
+        <TweakSlider label="Heading size" value={tweaks.heroSize} min={36} max={80} step={2}
+                     onChange={v => setTweak('heroSize', v)} />
+        <TweakColor  label="Accent color" value={tweaks.accentColor}
+                     onChange={v => setTweak('accentColor', v)} />
+        <TweakSection label="Shape" />
+        <TweakSlider label="Corner radius" value={tweaks.roundness} min={0} max={24} step={2}
+                     onChange={v => setTweak('roundness', v)} />
+        <TweakSection label="Layout" />
+        <TweakToggle label="Feature strip" value={tweaks.showFeatureStrip}
+                     onChange={v => setTweak('showFeatureStrip', v)} />
+      </TweaksPanel>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

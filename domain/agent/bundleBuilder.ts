@@ -4,6 +4,10 @@ import type { DestinationContext } from "@/domain/agent/destinationIntelligence"
 import type {
   Bundle,
   BundleItem,
+  BundleReasoning,
+  CategoryReasoning,
+  ScoreBreakdown,
+  ScoredCandidate,
   Product,
   ProductCategory,
   TravelPlan,
@@ -47,6 +51,7 @@ export function buildBundle(
   const allowedCatalog = filterByTraveller(catalog, plan.travellerType);
 
   const items: BundleItem[] = [];
+  const categoryReasonings: CategoryReasoning[] = [];
 
   for (const category of plan.constraints.requiredCategories) {
     if (excluded.has(category)) continue;
@@ -66,13 +71,15 @@ export function buildBundle(
       continue;
     }
 
-    const { product, why, effectivePriceBand } = pick;
+    const { product, why, effectivePriceBand, reasoning } = pick;
 
     if (effectivePriceBand !== priceBand) {
       warnings.push(
         `${prettyCategory(category)}: preferred ${priceBand} tier unavailable — showing ${effectivePriceBand}.`
       );
     }
+
+    categoryReasonings.push({ category, ...reasoning });
 
     items.push({
       sku: product.sku,
@@ -105,6 +112,7 @@ export function buildBundle(
         destCtx,
       });
       if (pick) {
+        categoryReasonings.push({ category: cat, ...pick.reasoning });
         items.push({
           sku: pick.product.sku,
           name: pick.product.name,
@@ -121,11 +129,26 @@ export function buildBundle(
 
   const estimatedTotal = round2(items.reduce((s, i) => s + i.priceEur * i.qty, 0));
 
+  const reasoning: BundleReasoning = {
+    destinationMatched: destCtx?.matched ?? false,
+    destinationDisplayName: destCtx?.displayName ?? "",
+    destinationFlag: destCtx?.flag ?? "",
+    uvIndexPeak: destCtx?.uvIndexPeak ?? 0,
+    avgTempC: destCtx?.avgTempC ?? 0,
+    spfMinimum: destCtx?.spfMinimum ?? 30,
+    malariaRisk: destCtx?.malariaRisk ?? false,
+    tapWaterSafe: destCtx?.tapWaterSafe ?? true,
+    requiredCategories: plan.constraints.requiredCategories,
+    effectivePriceBand: priceBand,
+    categories: categoryReasonings,
+  };
+
   return {
     items,
     itemCount: items.length,
     estimatedTotal,
     warnings,
+    reasoning,
   };
 }
 
@@ -145,6 +168,7 @@ interface PickResult {
   product: Product;
   why: string;
   effectivePriceBand: PriceBand;
+  reasoning: Omit<CategoryReasoning, "category">;
 }
 
 function pickProduct(args: PickArgs): PickResult | null {
@@ -155,10 +179,17 @@ function pickProduct(args: PickArgs): PickResult | null {
 
   if (candidates.length === 0) return null;
 
-  const scored = candidates.map((p) => ({
-    product: p,
-    score: scoreCandidate(p, args.plan, args.priceBand, args.destCtx),
-  }));
+  const scored: Array<{ product: Product } & ScoredCandidate> = candidates.map((p) => {
+    const { score, breakdown } = scoreCandidate(p, args.plan, args.priceBand, args.destCtx);
+    return {
+      product: p,
+      sku: p.sku,
+      name: p.name,
+      brand: p.brand,
+      score,
+      breakdown,
+    };
+  });
   scored.sort((a, b) => b.score - a.score);
 
   const best = scored[0];
@@ -168,10 +199,20 @@ function pickProduct(args: PickArgs): PickResult | null {
   const effectivePriceBand =
     (chosen.attributes.priceBand as PriceBand | undefined) ?? args.priceBand;
 
+  const runnerUp = scored[1]
+    ? { sku: scored[1].sku, name: scored[1].name, brand: scored[1].brand, score: scored[1].score, breakdown: scored[1].breakdown }
+    : null;
+
   return {
     product: chosen,
     why: buildWhy(chosen, args.plan, args.destCtx),
     effectivePriceBand,
+    reasoning: {
+      candidatesEvaluated: candidates.length,
+      winner: { sku: best.sku, name: best.name, brand: best.brand, score: best.score, breakdown: best.breakdown },
+      runnerUp,
+      priceBandDegraded: effectivePriceBand !== args.priceBand,
+    },
   };
 }
 
@@ -180,30 +221,43 @@ function scoreCandidate(
   plan: TravelPlan,
   targetBand: PriceBand,
   destCtx?: DestinationContext
-): number {
-  let score = 10;
+): { score: number; breakdown: ScoreBreakdown } {
+  const bd: ScoreBreakdown = {
+    base: 10,
+    priceBandBonus: 0,
+    sensitiveBonus: 0,
+    fragranceFreeBonus: 0,
+    travelSizeBonus: 0,
+    childFriendlyBonus: 0,
+    destSpfBonus: 0,
+    destHydrationBonus: 0,
+    destTapWaterBonus: 0,
+    beachSpfBonus: 0,
+    aerosolPenalty: 0,
+    total: 0,
+  };
 
   // Price band match.
-  if (p.attributes.priceBand === targetBand) score += 5;
-  else if (bandDistance(p.attributes.priceBand, targetBand) === 1) score += 2;
+  if (p.attributes.priceBand === targetBand) bd.priceBandBonus = 5;
+  else if (bandDistance(p.attributes.priceBand, targetBand) === 1) bd.priceBandBonus = 2;
 
   // Sensitivity preferences.
   const wantsSensitive = plan.sensitivities.includes("sensitive_skin");
   const wantsFragranceFree = plan.sensitivities.includes("fragrance_free_preference");
-  if (wantsSensitive && p.attributes.sensitiveSkin) score += 4;
-  if (wantsSensitive && !p.attributes.sensitiveSkin) score -= 2;
-  if (wantsFragranceFree && p.attributes.fragranceFree) score += 3;
-  if (wantsFragranceFree && !p.attributes.fragranceFree) score -= 2;
+  if (wantsSensitive && p.attributes.sensitiveSkin) bd.sensitiveBonus = 4;
+  else if (wantsSensitive && !p.attributes.sensitiveSkin) bd.sensitiveBonus = -2;
+  if (wantsFragranceFree && p.attributes.fragranceFree) bd.fragranceFreeBonus = 3;
+  else if (wantsFragranceFree && !p.attributes.fragranceFree) bd.fragranceFreeBonus = -2;
 
   // Travel size preferred.
-  if (p.attributes.travelSize) score += 1;
+  if (p.attributes.travelSize) bd.travelSizeBonus = 1;
 
   // Child-friendly bonus for family/child travellers.
   if (
     (plan.travellerType === "child" || plan.travellerType === "family") &&
     p.attributes.forChildren
   ) {
-    score += 3;
+    bd.childFriendlyBonus = 3;
   }
 
   // --- Destination intelligence rules ---
@@ -211,35 +265,40 @@ function scoreCandidate(
     const spfMin = destCtx.spfMinimum;
     const itemSpf = p.attributes.spf ?? 0;
     if (itemSpf >= spfMin) {
-      // Meets destination minimum — strong boost
-      score += 6;
+      bd.destSpfBonus = 6;
+      // Extra boost for very high UV destinations
+      if (destCtx.uvIndexPeak >= 10 && itemSpf >= 50) bd.destSpfBonus += 3;
     } else {
       // Below destination minimum SPF — heavy penalty, effectively excluded
-      score -= 15;
+      bd.destSpfBonus = -15;
     }
-    // Extra boost for very high UV destinations
-    if (destCtx.uvIndexPeak >= 10 && itemSpf >= 50) score += 3;
   } else if (!destCtx?.matched) {
     // No destination: fall back to beach/destination type scoring
     if (plan.destinationType === "beach" && p.attributes.spf) {
-      score += Math.min(3, Math.floor(p.attributes.spf / 20));
+      bd.beachSpfBonus = Math.min(3, Math.floor(p.attributes.spf / 20));
     }
   }
 
   // Hot destinations → boost hydration
   if (destCtx?.matched && destCtx.avgTempC >= 30 && p.category === "HYDRATION") {
-    score += 4;
+    bd.destHydrationBonus = 4;
   }
 
   // Unsafe water → boost first aid / hygiene
   if (destCtx?.matched && !destCtx.tapWaterSafe) {
-    if (p.category === "FIRST_AID" || p.category === "HYGIENE") score += 2;
+    if (p.category === "FIRST_AID" || p.category === "HYGIENE") bd.destTapWaterBonus = 2;
   }
 
   // Slight penalty on aerosol where a non-aerosol alternative exists.
-  if (p.attributes.aerosol) score -= 1;
+  if (p.attributes.aerosol) bd.aerosolPenalty = -1;
 
-  return score;
+  bd.total =
+    bd.base + bd.priceBandBonus + bd.sensitiveBonus + bd.fragranceFreeBonus +
+    bd.travelSizeBonus + bd.childFriendlyBonus + bd.destSpfBonus +
+    bd.destHydrationBonus + bd.destTapWaterBonus + bd.beachSpfBonus +
+    bd.aerosolPenalty;
+
+  return { score: bd.total, breakdown: bd };
 }
 
 function bandDistance(

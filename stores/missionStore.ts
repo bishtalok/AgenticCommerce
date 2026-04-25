@@ -8,6 +8,7 @@ import type {
   TravelPlan,
   Bundle,
   BundleItem,
+  BundleReasoning,
   QuestionDef,
   NextQuestion,
   FulfilmentMode,
@@ -44,6 +45,7 @@ interface MissionState {
   planId: string | null;
   plan: TravelPlan | null;
   bundle: Bundle | null;
+  reasoning: BundleReasoning | null;
   priceBand: PriceBand | null;
   removedSkus: string[];
   basket: CartSnapshot | null;
@@ -60,6 +62,7 @@ interface MissionState {
   setCurrentQuestion: (q: NextQuestion | null) => void;
   setPlan: (planId: string, plan: TravelPlan) => void;
   setBundle: (bundle: Bundle) => void;
+  setReasoning: (reasoning: BundleReasoning | null) => void;
   setPriceBand: (band: PriceBand) => void;
   removeSku: (sku: string) => void;
   restoreSku: (sku: string) => void;
@@ -77,6 +80,7 @@ const initial = {
   planId: null,
   plan: null,
   bundle: null,
+  reasoning: null as BundleReasoning | null,
   priceBand: null,
   removedSkus: [] as string[],
   basket: null,
@@ -100,6 +104,7 @@ export const useMissionStore = create<MissionState>()(
       setPlan: (planId, plan) =>
         set({ planId, plan, priceBand: plan.constraints.priceBand }),
       setBundle: (bundle) => set({ bundle }),
+      setReasoning: (reasoning) => set({ reasoning }),
       setPriceBand: (priceBand) => set({ priceBand }),
       removeSku: (sku) =>
         set((s) => ({
@@ -125,6 +130,7 @@ export const useMissionStore = create<MissionState>()(
         planId: s.planId,
         plan: s.plan,
         bundle: s.bundle,
+        reasoning: s.reasoning,
         priceBand: s.priceBand,
         removedSkus: s.removedSkus,
         basket: s.basket,

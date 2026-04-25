@@ -79,11 +79,58 @@ export interface BundleItem {
   };
 }
 
+/** Per-product score components — drives the Reasoning panel. */
+export interface ScoreBreakdown {
+  base: number;
+  priceBandBonus: number;
+  sensitiveBonus: number;
+  fragranceFreeBonus: number;
+  travelSizeBonus: number;
+  childFriendlyBonus: number;
+  destSpfBonus: number;     // +6/+9 meets minimum, -15 below
+  destHydrationBonus: number;
+  destTapWaterBonus: number;
+  beachSpfBonus: number;    // fallback when no destination matched
+  aerosolPenalty: number;
+  total: number;
+}
+
+export interface ScoredCandidate {
+  sku: string;
+  name: string;
+  brand: string | null;
+  score: number;
+  breakdown: ScoreBreakdown;
+}
+
+export interface CategoryReasoning {
+  category: ProductCategory;
+  candidatesEvaluated: number;
+  winner: ScoredCandidate;
+  runnerUp: ScoredCandidate | null;
+  priceBandDegraded: boolean;
+}
+
+export interface BundleReasoning {
+  destinationMatched: boolean;
+  destinationDisplayName: string;
+  destinationFlag: string;
+  uvIndexPeak: number;
+  avgTempC: number;
+  spfMinimum: number;
+  malariaRisk: boolean;
+  tapWaterSafe: boolean;
+  requiredCategories: ProductCategory[];
+  effectivePriceBand: PriceBand;
+  categories: CategoryReasoning[];
+}
+
 export interface Bundle {
   items: BundleItem[];
   itemCount: number;
   estimatedTotal: number;
   warnings: string[];
+  reasoning?: BundleReasoning;
 }
 
 export interface IntentResult {

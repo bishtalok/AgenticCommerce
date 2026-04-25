@@ -152,6 +152,46 @@ describe("buildBundle — child/family guardrail", () => {
   });
 });
 
+describe("buildBundle — reasoning / explainability", () => {
+  it("bundle carries a reasoning object", () => {
+    const plan = makePlan();
+    const bundle = buildBundle(plan, catalog);
+    expect(bundle.reasoning).toBeDefined();
+    expect(bundle.reasoning!.categories.length).toBeGreaterThan(0);
+  });
+
+  it("each category reasoning has a winner and candidatesEvaluated > 0", () => {
+    const plan = makePlan();
+    const bundle = buildBundle(plan, catalog);
+    for (const cat of bundle.reasoning!.categories) {
+      expect(cat.candidatesEvaluated).toBeGreaterThan(0);
+      expect(cat.winner.sku).toBeTruthy();
+      expect(cat.winner.breakdown.total).toBe(cat.winner.score);
+    }
+  });
+
+  it("destination intelligence is reflected in reasoning when matched", () => {
+    const plan = makePlan();
+    const bundle = buildBundle(plan, catalog, {
+      destinationContext: {
+        matched: true, key: "spain", displayName: "Spain", flag: "🇪🇸",
+        region: "Southern Europe", uvIndexPeak: 9, avgTempC: 33,
+        malariaRisk: false, tapWaterSafe: true,
+        healthAdvisories: [], vaccineRecommendations: [],
+        spfMinimum: 50, packingNotes: [],
+      },
+    });
+    expect(bundle.reasoning!.destinationMatched).toBe(true);
+    expect(bundle.reasoning!.destinationDisplayName).toBe("Spain");
+    expect(bundle.reasoning!.spfMinimum).toBe(50);
+    // SUN_CARE winner should meet the SPF50 minimum
+    const sunCat = bundle.reasoning!.categories.find((c) => c.category === "SUN_CARE");
+    if (sunCat) {
+      expect(sunCat.winner.breakdown.destSpfBonus).toBeGreaterThan(0);
+    }
+  });
+});
+
 describe("buildBundle — removedSkus persistence", () => {
   it("respects user-removed SKUs across regeneration", () => {
     const plan = makePlan();
@@ -169,9 +209,13 @@ describe("_test helpers", () => {
     const p = catalog.find((c) => c.attributes.priceBand === "mid")!;
     const pOther = catalog.find((c) => c.attributes.priceBand === "value")!;
     if (!p || !pOther) return;
-    const s1 = _test.scoreCandidate(p, plan, "mid");
-    const s2 = _test.scoreCandidate(pOther, plan, "mid");
-    expect(s1).toBeGreaterThan(s2);
+    const r1 = _test.scoreCandidate(p, plan, "mid");
+    const r2 = _test.scoreCandidate(pOther, plan, "mid");
+    expect(r1.score).toBeGreaterThan(r2.score);
+    // Score breakdown should be populated
+    expect(r1.breakdown.priceBandBonus).toBe(5);  // exact match
+    expect(r1.breakdown.base).toBe(10);
+    expect(r1.breakdown.total).toBe(r1.score);
   });
 
   it("bandDistance returns 0 for same band", () => {

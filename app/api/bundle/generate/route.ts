@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
         estimatedTotal: bundle.estimatedTotal,
         warnings: bundle.warnings,
       },
+      bundleReasoning: bundle.reasoning ?? null,
     });
   } catch (err) {
     if (err instanceof z.ZodError) {

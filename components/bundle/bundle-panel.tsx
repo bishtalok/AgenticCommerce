@@ -1,11 +1,17 @@
 "use client";
 
-import type { Bundle, PriceBand } from "@/domain/types";
+import { useState } from "react";
+import type { Bundle, BundleReasoning, PriceBand } from "@/domain/types";
 import { BundleItem } from "./bundle-item";
 import { PriceBandSwitcher } from "./rebuild-button";
+import { ReasoningPanel } from "./reasoning-panel";
+import { cn } from "@/lib/utils";
+
+type Tab = "kit" | "reasoning";
 
 export function BundlePanel({
   bundle,
+  reasoning,
   priceBand,
   loading,
   error,
@@ -15,6 +21,7 @@ export function BundlePanel({
   addingToCart,
 }: {
   bundle: Bundle | null;
+  reasoning: BundleReasoning | null;
   priceBand: PriceBand | null;
   loading: boolean;
   error: string | null;
@@ -23,6 +30,11 @@ export function BundlePanel({
   onAddToCart: () => void;
   addingToCart: boolean;
 }) {
+  const [tab, setTab] = useState<Tab>("kit");
+
+  // Reset to kit tab when bundle changes (new build)
+  const hasBundle = Boolean(bundle);
+
   return (
     <aside
       className="flex h-full flex-col gap-3 border-l bg-boots-sky/20 p-4"
@@ -49,6 +61,18 @@ export function BundlePanel({
             disabled={loading || !bundle}
           />
         </div>
+
+        {/* Tab strip — only visible once bundle is ready */}
+        {hasBundle && (
+          <div role="tablist" aria-label="Bundle view" className="flex rounded-lg bg-muted p-0.5 mt-1">
+            <TabBtn id="kit" active={tab === "kit"} onClick={() => setTab("kit")}>
+              🧳 Kit
+            </TabBtn>
+            <TabBtn id="reasoning" active={tab === "reasoning"} onClick={() => setTab("reasoning")}>
+              🔬 Why?
+            </TabBtn>
+          </div>
+        )}
       </header>
 
       <div className="flex-1 overflow-y-auto">
@@ -67,20 +91,31 @@ export function BundlePanel({
 
         {loading && !bundle ? <BundleSkeleton /> : null}
 
-        {bundle ? (
-          <ul className="flex flex-col gap-2" aria-live="polite">
-            {bundle.items.map((item) => (
-              <BundleItem key={item.sku} item={item} onRemove={onRemove} />
-            ))}
-          </ul>
+        {bundle && tab === "kit" ? (
+          <>
+            <ul className="flex flex-col gap-2" aria-live="polite">
+              {bundle.items.map((item) => (
+                <BundleItem key={item.sku} item={item} onRemove={onRemove} />
+              ))}
+            </ul>
+            {bundle.warnings.length > 0 ? (
+              <ul className="mt-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
+                {bundle.warnings.map((w, i) => (
+                  <li key={i}>• {w}</li>
+                ))}
+              </ul>
+            ) : null}
+          </>
         ) : null}
 
-        {bundle && bundle.warnings.length > 0 ? (
-          <ul className="mt-3 rounded-md border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900">
-            {bundle.warnings.map((w, i) => (
-              <li key={i}>• {w}</li>
-            ))}
-          </ul>
+        {bundle && tab === "reasoning" && reasoning ? (
+          <ReasoningPanel reasoning={reasoning} />
+        ) : null}
+
+        {bundle && tab === "reasoning" && !reasoning ? (
+          <p className="py-8 text-center text-xs text-muted-foreground">
+            Reasoning data unavailable.
+          </p>
         ) : null}
       </div>
 
@@ -88,13 +123,43 @@ export function BundlePanel({
         <button
           type="button"
           onClick={onAddToCart}
-          disabled={!bundle || addingToCart}
+          disabled={!bundle || addingToCart || tab === "reasoning"}
           className="w-full rounded-md bg-boots-navy px-4 py-3 text-sm font-semibold text-white hover:bg-boots-blue focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-boots-blue disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {addingToCart ? "Adding…" : "Add kit to basket & continue"}
+          {addingToCart ? "Adding…" : tab === "reasoning" ? "Switch to Kit to add" : "Add kit to basket & continue"}
         </button>
       </footer>
     </aside>
+  );
+}
+
+function TabBtn({
+  id,
+  active,
+  onClick,
+  children,
+}: {
+  id: string;
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      role="tab"
+      id={`tab-${id}`}
+      aria-selected={active}
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex-1 rounded-md py-1.5 text-xs font-semibold transition-all",
+        active
+          ? "bg-white text-boots-navy shadow-sm"
+          : "text-muted-foreground hover:text-boots-navy"
+      )}
+    >
+      {children}
+    </button>
   );
 }
 

@@ -14,6 +14,7 @@ import type {
   QuestionDef,
   TravelPlan,
   Bundle,
+  BundleReasoning,
   PriceBand,
   MissionCode,
   IntentResult,
@@ -54,6 +55,7 @@ function MissionPageInner() {
     plan,
     planId,
     bundle,
+    reasoning,
     priceBand,
     removedSkus,
     basket,
@@ -64,6 +66,7 @@ function MissionPageInner() {
     setCurrentQuestion,
     setPlan,
     setBundle,
+    setReasoning,
     setPriceBand,
     removeSku,
     setBasket,
@@ -234,14 +237,15 @@ function MissionPageInner() {
           }),
         });
         const bundleData = (await bundleRes.json()) as
-          | { bundleItems: Bundle["items"]; bundleMeta: Omit<Bundle, "items"> }
+          | { bundleItems: Bundle["items"]; bundleMeta: Omit<Bundle, "items" | "reasoning">; bundleReasoning: BundleReasoning | null }
           | { error: { userMessage: string } };
         if (!bundleRes.ok)
           throw new Error(
             "error" in bundleData ? bundleData.error.userMessage : "Bundle failed"
           );
-        const b = bundleData as { bundleItems: Bundle["items"]; bundleMeta: Omit<Bundle, "items"> };
+        const b = bundleData as { bundleItems: Bundle["items"]; bundleMeta: Omit<Bundle, "items" | "reasoning">; bundleReasoning: BundleReasoning | null };
         setBundle({ items: b.bundleItems, ...b.bundleMeta });
+        setReasoning(b.bundleReasoning);
         setStage("ready");
         pushMessage(
           makeMessage({
@@ -277,11 +281,12 @@ function MissionPageInner() {
           }),
         });
         const data = (await res.json()) as
-          | { bundleItems: Bundle["items"]; bundleMeta: Omit<Bundle, "items"> }
+          | { bundleItems: Bundle["items"]; bundleMeta: Omit<Bundle, "items" | "reasoning">; bundleReasoning: BundleReasoning | null }
           | { error: { userMessage: string } };
         if (!res.ok) throw new Error("error" in data ? data.error.userMessage : "Rebuild failed");
-        const b = data as { bundleItems: Bundle["items"]; bundleMeta: Omit<Bundle, "items"> };
+        const b = data as { bundleItems: Bundle["items"]; bundleMeta: Omit<Bundle, "items" | "reasoning">; bundleReasoning: BundleReasoning | null };
         setBundle({ items: b.bundleItems, ...b.bundleMeta });
+        setReasoning(b.bundleReasoning);
       } catch (e) {
         setBundleError((e as Error).message);
       } finally {
@@ -438,6 +443,7 @@ function MissionPageInner() {
         />
         <BundlePanel
           bundle={bundle}
+          reasoning={reasoning}
           priceBand={priceBand}
           loading={bundleLoading}
           error={bundleError}
